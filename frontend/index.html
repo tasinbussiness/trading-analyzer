@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Analyzer - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="login-body">
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bg-circle circle1"></div>
+        <div class="bg-circle circle2"></div>
+        <div class="bg-circle circle3"></div>
+        <div class="particles" id="particles"></div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="login-wrapper">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h1 class="logo-title">Trading Analyzer</h1>
+            <p class="logo-subtitle">Professional Trading Signal System</p>
+        </div>
+
+        <!-- Login Mode Buttons -->
+        <div class="login-modes">
+            <button class="mode-btn active" data-mode="user" onclick="setMode('user')">
+                <span class="mode-emoji">👤</span>
+                <span class="mode-text">User</span>
+            </button>
+            <button class="mode-btn" data-mode="admin" onclick="setMode('admin')">
+                <span class="mode-emoji">🔧</span>
+                <span class="mode-text">Admin</span>
+            </button>
+            <button class="mode-btn" data-mode="owner" onclick="setMode('owner')">
+                <span class="mode-emoji">👑</span>
+                <span class="mode-text">Owner</span>
+            </button>
+        </div>
+
+        <!-- Login Form -->
+        <div class="login-card">
+            <div class="login-card-header">
+                <h2 id="loginTitle">User Login</h2>
+                <p id="loginSubtitle">Welcome back! Please login to continue</p>
+            </div>
+
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <input type="text" id="username" placeholder="Enter Username" required>
+                    <div class="input-line"></div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <input type="password" id="password" placeholder="Enter Password" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                    <div class="input-line"></div>
+                </div>
+
+                <div class="forgot-password">
+                    <a href="#" onclick="showForgotPassword()">
+                        <i class="fas fa-key"></i> Forgot Password?
+                    </a>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span class="btn-text">Login</span>
+                    <div class="btn-loader" style="display:none;">
+                        <div class="spinner"></div>
+                    </div>
+                    <i class="fas fa-arrow-right btn-arrow"></i>
+                </button>
+
+                <div class="register-link">
+                    <p>Don't have an account? <a href="register.html">Register Now</a></p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Forgot Password Modal -->
+        <div class="modal-overlay" id="forgotModal" style="display:none;">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h3><i class="fas fa-key"></i> Reset Password</h3>
+                    <button onclick="closeForgotModal()" class="modal-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <input type="text" id="resetLicense" placeholder="Enter License Key">
+                        <div class="input-line"></div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" id="newPassword" placeholder="New Password">
+                        <div class="input-line"></div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" id="confirmPassword" placeholder="Confirm Password">
+                        <div class="input-line"></div>
+                    </div>
+                    <button class="login-btn" onclick="resetPassword()">
+                        <span>Reset Password</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-icon" id="toastIcon"></div>
+        <div class="toast-content">
+            <p id="toastMessage"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

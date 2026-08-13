@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Analyzer - Register</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="login-body">
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bg-circle circle1"></div>
+        <div class="bg-circle circle2"></div>
+        <div class="bg-circle circle3"></div>
+        <div class="particles" id="particles"></div>
+    </div>
+
+    <!-- Register Container -->
+    <div class="login-wrapper">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h1 class="logo-title">Trading Analyzer</h1>
+            <p class="logo-subtitle">Create Your Account</p>
+        </div>
+
+        <!-- Register Card -->
+        <div class="login-card">
+            <div class="login-card-header">
+                <h2>Create Account</h2>
+                <p>Fill in the details to get started</p>
+            </div>
+
+            <form class="login-form" onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <div class="input-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <input type="text" id="licenseKey" placeholder="Enter License Key" required>
+                    <div class="input-line"></div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <input type="text" id="regUsername" placeholder="Choose Username" required>
+                    <div class="input-line"></div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <input type="password" id="regPassword" placeholder="Choose Password" required>
+                    <button type="button" class="toggle-password" onclick="toggleRegPassword()">
+                        <i class="fas fa-eye" id="regEyeIcon"></i>
+                    </button>
+                    <div class="input-line"></div>
+                </div>
+
+                <div class="license-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>License key is required. Contact admin to get one.</span>
+                </div>
+
+                <button type="submit" class="login-btn" id="registerBtn">
+                    <span class="btn-text">Create Account</span>
+                    <div class="btn-loader" style="display:none;">
+                        <div class="spinner"></div>
+                    </div>
+                    <i class="fas fa-arrow-right btn-arrow"></i>
+                </button>
+
+                <div class="register-link">
+                    <p>Already have an account? <a href="index.html">Login Here</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-icon" id="toastIcon"></div>
+        <div class="toast-content">
+            <p id="toastMessage"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

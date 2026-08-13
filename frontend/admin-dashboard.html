@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Analyzer - Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-body admin-theme">
+
+    <!-- Sidebar -->
+    <div class="sidebar admin-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo admin-logo">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h3>Trading Analyzer</h3>
+            <p class="sidebar-role">🔧 Admin Panel</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" onclick="showPage('analyzer', this)">
+                <i class="fas fa-robot"></i>
+                <span>Analyzer</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('usercontrol', this)">
+                <i class="fas fa-users-cog"></i>
+                <span>User Control</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('license', this)">
+                <i class="fas fa-key"></i>
+                <span>License Generator</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('usercredits', this)">
+                <i class="fas fa-coins"></i>
+                <span>User Credits</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('profile', this)">
+                <i class="fas fa-user-circle"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar admin-topbar">
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="topbar-right">
+                <div class="admin-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Admin</span>
+                </div>
+                <div class="user-avatar">
+                    <img src="" alt="" id="avatarImg" style="display:none;">
+                    <i class="fas fa-user-shield" id="avatarIcon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ANALYZER PAGE ===== -->
+        <div class="page active" id="page-analyzer">
+            <div class="page-header">
+                <h1><i class="fas fa-robot"></i> AI Analyzer</h1>
+                <p>Admin Analyzer - Unlimited Access</p>
+            </div>
+
+            <!-- Upload Box -->
+            <div class="upload-container">
+                <div class="upload-box" id="uploadBox" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <div class="upload-content" id="uploadContent">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h3>Drop Chart Screenshot Here</h3>
+                        <p>or click to browse • Paste with Ctrl+V</p>
+                        <div class="upload-formats">
+                            <span>PNG</span>
+                            <span>JPG</span>
+                            <span>JPEG</span>
+                        </div>
+                    </div>
+                    <div class="upload-preview" id="uploadPreview" style="display:none;">
+                        <img id="previewImg" src="" alt="Preview">
+                        <button class="remove-img" onclick="removeImage()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)" style="display:none;">
+                </div>
+
+                <button class="analyze-btn" id="analyzeBtn" onclick="startAnalysis()" disabled>
+                    <i class="fas fa-search-dollar"></i>
+                    <span>Analyze Chart</span>
+                </button>
+            </div>
+
+            <!-- Processing -->
+            <div class="processing-container" id="processingContainer" style="display:none;">
+                <div class="processing-animation">
+                    <div class="processing-circle">
+                        <svg viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" class="circle-bg"/>
+                            <circle cx="50" cy="50" r="45" class="circle-progress" id="progressCircle"/>
+                        </svg>
+                        <div class="processing-percent" id="processPercent">0%</div>
+                    </div>
+                </div>
+                <h3 class="processing-text" id="processingText">Analyzing Chart...</h3>
+                <div class="processing-steps">
+                    <div class="step" id="step1"><i class="fas fa-check-circle"></i><span>Reading Chart</span></div>
+                    <div class="step" id="step2"><i class="fas fa-circle"></i><span>Detecting Patterns</span></div>
+                    <div class="step" id="step3"><i class="fas fa-circle"></i><span>Applying Strategies</span></div>
+                    <div class="step" id="step4"><i class="fas fa-circle"></i><span>Generating Signal</span></div>
+                </div>
+            </div>
+
+            <!-- Result Box -->
+            <div class="result-container" id="resultContainer" style="display:none;">
+                <div class="result-header" id="resultHeader">
+                    <div class="result-signal" id="resultSignal">
+                        <span class="signal-icon" id="signalIcon"></span>
+                        <span class="signal-text" id="signalText"></span>
+                    </div>
+                </div>
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-card-label">Confidence</div>
+                        <div class="result-card-value" id="resultConfidence">0%</div>
+                        <div class="result-card-bar"><div class="bar-fill" id="confidenceBar"></div></div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-card-label">Risk Level</div>
+                        <div class="result-card-value" id="resultRisk">Low</div>
+                        <div class="result-card-bar"><div class="bar-fill" id="riskBar"></div></div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-card-label">Market Strength</div>
+                        <div class="result-card-value" id="resultStrength">0%</div>
+                        <div class="result-card-bar"><div class="bar-fill" id="strengthBar"></div></div>
+                    </div>
+                </div>
+                <div class="strategy-list">
+                    <h4><i class="fas fa-chess"></i> Matched Strategies</h4>
+                    <div id="strategyTags" class="strategy-tags"></div>
+                </div>
+                <div class="result-note" id="resultNote"></div>
+                <button class="new-analysis-btn" onclick="resetAnalysis()">
+                    <i class="fas fa-redo"></i> New Analysis
+                </button>
+            </div>
+
+            <!-- Warning Box -->
+            <div class="warning-container" id="warningContainer" style="display:none;">
+                <div class="warning-icon">⚠️</div>
+                <h3 id="warningTitle">Warning</h3>
+                <p id="warningMessage"></p>
+                <button class="new-analysis-btn" onclick="resetAnalysis()"><i class="fas fa-redo"></i> Try Again</button>
+            </div>
+        </div>
+
+        <!-- ===== USER CONTROL PAGE ===== -->
+        <div class="page" id="page-usercontrol">
+            <div class="page-header">
+                <h1><i class="fas fa-users-cog"></i> User Control</h1>
+                <p>Manage all users</p>
+            </div>
+
+            <div class="control-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="userSearch" placeholder="Search users..." oninput="searchUsers()">
+                </div>
+            </div>
+
+            <div class="users-grid" id="usersGrid">
+                <!-- Users will be loaded here -->
+            </div>
+        </div>
+
+        <!-- ===== LICENSE GENERATOR PAGE ===== -->
+        <div class="page" id="page-license">
+            <div class="page-header">
+                <h1><i class="fas fa-key"></i> License Generator</h1>
+                <p>Generate user license keys</p>
+            </div>
+
+            <div class="license-generator-card">
+                <div class="license-type-select">
+                    <h4>License Type</h4>
+                    <div class="license-types">
+                        <button class="license-type-btn active" onclick="selectLicenseType('user', this)">
+                            <span>👤</span>
+                            <span>User License</span>
+                        </button>
+                    </div>
+                    <p class="license-note">
+                        <i class="fas fa-info-circle"></i>
+                        Admin can only generate User licenses
+                    </p>
+                </div>
+
+                <div class="license-options">
+                    <div class="profile-info-item">
+                        <label>Credits Amount</label>
+                        <input type="number" id="licenseCredits" value="50" min="1" max="1000">
+                    </div>
+                </div>
+
+                <button class="save-btn generate-btn" onclick="generateLicense()">
+                    <i class="fas fa-plus-circle"></i> Generate License
+                </button>
+
+                <div class="generated-license" id="generatedLicense" style="display:none;">
+                    <h4>Generated License Key</h4>
+                    <div class="license-key-display">
+                        <code id="licenseKeyOutput"></code>
+                        <button onclick="copyLicense()"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Licenses -->
+            <div class="license-list-card">
+                <h3><i class="fas fa-list"></i> All Licenses</h3>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>License Key</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Credits</th>
+                                <th>Used By</th>
+                            </tr>
+                        </thead>
+                        <tbody id="licenseList">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== USER CREDITS PAGE ===== -->
+        <div class="page" id="page-usercredits">
+            <div class="page-header">
+                <h1><i class="fas fa-coins"></i> User Credits</h1>
+                <p>Manage user credits</p>
+            </div>
+
+            <div class="credit-control-card">
+                <div class="profile-info-item">
+                    <label>Select User</label>
+                    <select id="creditUserSelect" class="styled-select">
+                        <option value="">Select a user</option>
+                    </select>
+                </div>
+                <div class="profile-info-item">
+                    <label>Current Credits</label>
+                    <input type="text" id="currentCredits" readonly value="0">
+                </div>
+                <div class="credit-actions">
+                    <div class="profile-info-item">
+                        <label>Add Credits</label>
+                        <div class="profile-input-group">
+                            <input type="number" id="addCreditsAmount" placeholder="Amount" min="1">
+                            <button onclick="addCredits()"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="profile-info-item">
+                        <label>Set Credits</label>
+                        <div class="profile-input-group">
+                            <input type="number" id="setCreditsAmount" placeholder="Amount" min="0">
+                            <button onclick="setCredits()"><i class="fas fa-edit"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PROFILE PAGE ===== -->
+        <div class="page" id="page-profile">
+            <div class="page-header">
+                <h1><i class="fas fa-user-circle"></i> Profile</h1>
+                <p>Manage your admin account</p>
+            </div>
+
+            <div class="profile-container">
+                <div class="profile-card">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar" id="profileAvatar">
+                            <img id="profileAvatarImg" src="" style="display:none;">
+                            <i class="fas fa-user-shield" id="profileAvatarIcon"></i>
+                            <label class="avatar-upload" for="avatarInput">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                            <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(event)" style="display:none;">
+                        </div>
+                        <h3 id="profileName">Admin</h3>
+                        <span class="profile-badge admin-badge-tag">🔧 Admin</span>
+                    </div>
+
+                    <div class="profile-info-grid">
+                        <div class="profile-info-item">
+                            <label>Nickname</label>
+                            <div class="profile-input-group">
+                                <input type="text" id="nickname" placeholder="Set nickname">
+                                <button onclick="saveNickname()"><i class="fas fa-save"></i></button>
+                            </div>
+                        </div>
+                        <div class="profile-info-item">
+                            <label>Username</label>
+                            <input type="text" id="profileUsername" readonly>
+                        </div>
+                        <div class="profile-info-item">
+                            <label>Account Type</label>
+                            <input type="text" value="Admin" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <h3 class="card-title"><i class="fas fa-key"></i> Change Password</h3>
+                    <div class="profile-info-item">
+                        <label>License Key (Required)</label>
+                        <input type="text" id="changeLicense" placeholder="Enter your license key">
+                    </div>
+                    <div class="profile-info-item">
+                        <label>New Password</label>
+                        <input type="password" id="changeNewPass" placeholder="Enter new password">
+                    </div>
+                    <div class="profile-info-item">
+                        <label>Confirm Password</label>
+                        <input type="password" id="changeConfirmPass" placeholder="Confirm new password">
+                    </div>
+                    <button class="save-btn" onclick="changePassword()">
+                        <i class="fas fa-save"></i> Update Password
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <div class="toast-icon" id="toastIcon"></div>
+        <div class="toast-content">
+            <p id="toastMessage"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="dashboard-common.js"></script>
+    <script src="admin-dashboard.js"></script>
+</body>
+</html>

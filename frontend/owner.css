@@ -1,0 +1,240 @@
+/* ===== OWNER PREMIUM THEME ===== */
+
+/* Owner Sidebar */
+.owner-sidebar {
+    background: linear-gradient(180deg, rgba(20, 10, 35, 0.98), rgba(10, 5, 25, 0.98));
+    border-right: 1px solid rgba(255, 184, 0, 0.15);
+}
+
+.owner-logo {
+    background: linear-gradient(135deg, #ffb800, #ff6584, #6c63ff);
+    box-shadow: 0 8px 30px rgba(255, 184, 0, 0.4);
+    animation: ownerGlow 3s ease-in-out infinite;
+}
+
+@keyframes ownerGlow {
+    0%, 100% { box-shadow: 0 8px 30px rgba(255, 184, 0, 0.4); }
+    50% { box-shadow: 0 8px 50px rgba(255, 184, 0, 0.7); }
+}
+
+.owner-sidebar .sidebar-role {
+    background: linear-gradient(135deg, rgba(255, 184, 0, 0.2), rgba(255, 101, 132, 0.2));
+    color: #ffb800;
+}
+
+.owner-sidebar .nav-item.active {
+    background: linear-gradient(135deg, rgba(255, 184, 0, 0.15), rgba(255, 101, 132, 0.1));
+    border-left: 3px solid #ffb800;
+}
+
+.owner-sidebar .nav-item.active i {
+    color: #ffb800;
+}
+
+.owner-sidebar .nav-item:hover:not(.active) {
+    background: rgba(255, 184, 0, 0.08);
+}
+
+/* Owner Topbar */
+.owner-topbar {
+    border: 1px solid rgba(255, 184, 0, 0.15);
+    background: rgba(255, 184, 0, 0.03);
+}
+
+.owner-avatar {
+    background: linear-gradient(135deg, #ffb800, #ff6584) !important;
+    box-shadow: 0 0 20px rgba(255, 184, 0, 0.3);
+}
+
+/* Owner Profile Card */
+.owner-profile-card {
+    border: 1px solid rgba(255, 184, 0, 0.2);
+    background: linear-gradient(135deg, rgba(255, 184, 0, 0.05), rgba(255, 101, 132, 0.05));
+}
+
+.owner-avatar-ring {
+    background: linear-gradient(135deg, #ffb800, #ff6584, #6c63ff) !important;
+    box-shadow: 0 0 30px rgba(255, 184, 0, 0.3);
+    padding: 3px;
+}
+
+.owner-avatar-ring::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    background: linear-gradient(135deg, #ffb800, #ff6584, #6c63ff);
+    border-radius: 28px;
+    z-index: -1;
+    opacity: 0.5;
+    animation: ownerRing 3s linear infinite;
+}
+
+@keyframes ownerRing {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Owner Page Headers */
+.owner-theme .page-header h1 i {
+    color: #ffb800;
+}
+
+/* Owner Buttons */
+.owner-theme .save-btn {
+    background: linear-gradient(135deg, #ffb800, #ff9f00);
+}
+
+.owner-theme .save-btn:hover {
+    box-shadow: 0 10px 30px rgba(255, 184, 0, 0.4);
+}
+
+.owner-theme .analyze-btn {
+    background: linear-gradient(135deg, #ffb800, #ff9f00);
+}
+
+.owner-theme .analyze-btn:hover:not(:disabled) {
+    box-shadow: 0 15px 40px rgba(255, 184, 0, 0.5);
+}
+
+/* Owner Strategy Section */
+.owner-theme .strategy-toggle-item:hover {
+    border-left: 3px solid #ffb800;
+}
+
+.owner-theme .toggle-switch input:checked + .toggle-slider {
+    background: linear-gradient(135deg, #ffb800, #ff6584);
+}
+
+/* Owner Upload Box */
+.owner-theme .upload-box {
+    border-color: rgba(255, 184, 0, 0.3);
+    background: rgba(255, 184, 0, 0.03);
+}
+
+.owner-theme .upload-box:hover {
+    border-color: #ffb800;
+    background: rgba(255, 184, 0, 0.08);
+    box-shadow: 0 10px 30px rgba(255, 184, 0, 0.15);
+}
+
+.owner-theme .upload-icon {
+    color: #ffb800;
+}
+
+.owner-theme .upload-formats span {
+    background: rgba(255, 184, 0, 0.15);
+    color: #ffb800;
+}
+
+/* Owner Credit Display */
+.owner-theme .credit-display {
+    background: linear-gradient(135deg, rgba(255, 184, 0, 0.15), rgba(255, 101, 132, 0.15));
+    color: #ffb800;
+}
+
+/* Owner Stat Cards */
+.owner-theme .stat-card {
+    border: 1px solid rgba(255, 184, 0, 0.1);
+}
+
+.owner-theme .stat-card:hover {
+    border-color: rgba(255, 184, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(255, 184, 0, 0.1);
+}
+
+/* Owner License Key Display */
+.owner-theme .license-key-display {
+    border-color: rgba(255, 184, 0, 0.3);
+}
+
+.owner-theme .license-key-display code {
+    color: #ffb800;
+}
+
+/* Owner Processing */
+.owner-theme .circle-progress {
+    stroke: #ffb800;
+}
+
+.owner-theme .processing-percent {
+    color: #ffb800;
+}
+
+/* Owner New Analysis Button */
+.owner-theme .new-analysis-btn {
+    background: rgba(255, 184, 0, 0.15);
+    border-color: rgba(255, 184, 0, 0.3);
+    color: #ffb800;
+}
+
+.owner-theme .new-analysis-btn:hover {
+    background: rgba(255, 184, 0, 0.25);
+}
+
+/* Owner Strategy Tags */
+.owner-theme .strategy-tag {
+    background: rgba(255, 184, 0, 0.15);
+    border-color: rgba(255, 184, 0, 0.3);
+    color: #ffb800;
+}
+
+/* Owner Background Effects */
+.owner-theme::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(255, 184, 0, 0.03), transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(255, 101, 132, 0.03), transparent 50%);
+    z-index: -1;
+    animation: ownerBgShift 15s ease-in-out infinite;
+}
+
+@keyframes ownerBgShift {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-5%, -5%); }
+}
+
+/* Premium Glow Effect on Cards */
+.owner-theme .profile-card,
+.owner-theme .license-generator-card,
+.owner-theme .notice-card,
+.owner-theme .strategy-section {
+    border: 1px solid rgba(255, 184, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.owner-theme .profile-card::before,
+.owner-theme .license-generator-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 184, 0, 0.05), transparent);
+    animation: cardShine 4s ease-in-out infinite;
+}
+
+@keyframes cardShine {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+}
+
+/* Owner Nav Item Glow */
+.owner-sidebar .nav-item.active::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background: #ffb800;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(255, 184, 0, 0.5);
+}

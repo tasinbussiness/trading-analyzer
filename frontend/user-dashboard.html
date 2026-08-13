@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Analyzer - User Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h3>Trading Analyzer</h3>
+            <p class="sidebar-role">👤 User Panel</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" onclick="showPage('analyzer', this)">
+                <i class="fas fa-robot"></i>
+                <span>Analyzer</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('alldata', this)">
+                <i class="fas fa-database"></i>
+                <span>All Data</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('profile', this)">
+                <i class="fas fa-user-circle"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="support-btn" onclick="showSupport()">
+                <i class="fas fa-headset"></i>
+                <span>Support</span>
+            </button>
+            <button class="logout-btn" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="topbar-right">
+                <div class="credit-display" id="creditDisplay">
+                    <i class="fas fa-coins"></i>
+                    <span id="creditCount">50</span>
+                </div>
+                <div class="user-avatar" id="userAvatar">
+                    <img src="" alt="" id="avatarImg" style="display:none;">
+                    <i class="fas fa-user" id="avatarIcon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notice Banner -->
+        <div class="notice-banner" id="noticeBanner" style="display:none;">
+            <i class="fas fa-bullhorn"></i>
+            <span id="noticeText"></span>
+            <button onclick="dismissNotice()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- ===== ANALYZER PAGE ===== -->
+        <div class="page active" id="page-analyzer">
+            <div class="page-header">
+                <h1><i class="fas fa-robot"></i> AI Analyzer</h1>
+                <p>Upload chart screenshot for analysis</p>
+            </div>
+
+            <!-- Credit Bar -->
+            <div class="credit-bar-container">
+                <div class="credit-bar-header">
+                    <span>Credits Remaining</span>
+                    <span id="creditText">50 / 50</span>
+                </div>
+                <div class="credit-bar">
+                    <div class="credit-bar-fill" id="creditBarFill" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <!-- Upload Box -->
+            <div class="upload-container">
+                <div class="upload-box" id="uploadBox" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <div class="upload-content" id="uploadContent">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h3>Drop Chart Screenshot Here</h3>
+                        <p>or click to browse • Paste with Ctrl+V</p>
+                        <div class="upload-formats">
+                            <span>PNG</span>
+                            <span>JPG</span>
+                            <span>JPEG</span>
+                        </div>
+                    </div>
+                    <div class="upload-preview" id="uploadPreview" style="display:none;">
+                        <img id="previewImg" src="" alt="Preview">
+                        <button class="remove-img" onclick="removeImage()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)" style="display:none;">
+                </div>
+
+                <button class="analyze-btn" id="analyzeBtn" onclick="startAnalysis()" disabled>
+                    <i class="fas fa-search-dollar"></i>
+                    <span>Analyze Chart</span>
+                </button>
+            </div>
+
+            <!-- Processing -->
+            <div class="processing-container" id="processingContainer" style="display:none;">
+                <div class="processing-animation">
+                    <div class="processing-circle">
+                        <svg viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" class="circle-bg"/>
+                            <circle cx="50" cy="50" r="45" class="circle-progress" id="progressCircle"/>
+                        </svg>
+                        <div class="processing-percent" id="processPercent">0%</div>
+                    </div>
+                </div>
+                <h3 class="processing-text" id="processingText">Analyzing Chart...</h3>
+                <div class="processing-steps">
+                    <div class="step" id="step1">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Reading Chart</span>
+                    </div>
+                    <div class="step" id="step2">
+                        <i class="fas fa-circle"></i>
+                        <span>Detecting Patterns</span>
+                    </div>
+                    <div class="step" id="step3">
+                        <i class="fas fa-circle"></i>
+                        <span>Applying Strategies</span>
+                    </div>
+                    <div class="step" id="step4">
+                        <i class="fas fa-circle"></i>
+                        <span>Generating Signal</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Box -->
+            <div class="result-container" id="resultContainer" style="display:none;">
+                <div class="result-header" id="resultHeader">
+                    <div class="result-signal" id="resultSignal">
+                        <span class="signal-icon" id="signalIcon"></span>
+                        <span class="signal-text" id="signalText"></span>
+                    </div>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-card">
+                        <div class="result-card-label">Confidence</div>
+                        <div class="result-card-value" id="resultConfidence">0%</div>
+                        <div class="result-card-bar">
+                            <div class="bar-fill" id="confidenceBar"></div>
+                        </div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-card-label">Risk Level</div>
+                        <div class="result-card-value" id="resultRisk">Low</div>
+                        <div class="result-card-bar">
+                            <div class="bar-fill" id="riskBar"></div>
+                        </div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-card-label">Market Strength</div>
+                        <div class="result-card-value" id="resultStrength">0%</div>
+                        <div class="result-card-bar">
+                            <div class="bar-fill" id="strengthBar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="strategy-list">
+                    <h4><i class="fas fa-chess"></i> Matched Strategies</h4>
+                    <div id="strategyTags" class="strategy-tags"></div>
+                </div>
+
+                <div class="result-note" id="resultNote"></div>
+
+                <button class="new-analysis-btn" onclick="resetAnalysis()">
+                    <i class="fas fa-redo"></i> New Analysis
+                </button>
+            </div>
+
+            <!-- Warning Box -->
+            <div class="warning-container" id="warningContainer" style="display:none;">
+                <div class="warning-icon">⚠️</div>
+                <h3 id="warningTitle">Warning</h3>
+                <p id="warningMessage"></p>
+                <button class="new-analysis-btn" onclick="resetAnalysis()">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== ALL DATA PAGE ===== -->
+        <div class="page" id="page-alldata">
+            <div class="page-header">
+                <h1><i class="fas fa-database"></i> All Data</h1>
+                <p>Your analysis statistics</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card stat-total">
+                    <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalAnalysis">0</h3>
+                        <p>Total Analysis</p>
+                    </div>
+                </div>
+                <div class="stat-card stat-today">
+                    <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
+                    <div class="stat-info">
+                        <h3 id="todayAnalysis">0</h3>
+                        <p>Today</p>
+                    </div>
+                </div>
+                <div class="stat-card stat-month">
+                    <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="stat-info">
+                        <h3 id="monthAnalysis">0</h3>
+                        <p>This Month</p>
+                    </div>
+                </div>
+                <div class="stat-card stat-avoid">
+                    <div class="stat-icon"><i class="fas fa-ban"></i></div>
+                    <div class="stat-info">
+                        <h3 id="avoidCount">0</h3>
+                        <p>Avoid Signals</p>
+                    </div>
+                </div>
+                <div class="stat-card stat-up">
+                    <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
+                    <div class="stat-info">
+                        <h3 id="upCount">0</h3>
+                        <p>Buy Signals</p>
+                    </div>
+                </div>
+                <div class="stat-card stat-down">
+                    <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
+                    <div class="stat-info">
+                        <h3 id="downCount">0</h3>
+                        <p>Sell Signals</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Analysis Table -->
+            <div class="data-table-container">
+                <h3><i class="fas fa-history"></i> Recent Analysis</h3>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Signal</th>
+                                <th>Confidence</th>
+                                <th>Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysisHistory">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PROFILE PAGE ===== -->
+        <div class="page" id="page-profile">
+            <div class="page-header">
+                <h1><i class="fas fa-user-circle"></i> Profile</h1>
+                <p>Manage your account</p>
+            </div>
+
+            <div class="profile-container">
+                <div class="profile-card">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar" id="profileAvatar">
+                            <img id="profileAvatarImg" src="" style="display:none;">
+                            <i class="fas fa-user" id="profileAvatarIcon"></i>
+                            <label class="avatar-upload" for="avatarInput">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                            <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(event)" style="display:none;">
+                        </div>
+                        <h3 id="profileName">Username</h3>
+                        <span class="profile-badge">👤 User</span>
+                    </div>
+
+                    <div class="profile-info-grid">
+                        <div class="profile-info-item">
+                            <label>Nickname</label>
+                            <div class="profile-input-group">
+                                <input type="text" id="nickname" placeholder="Set nickname">
+                                <button onclick="saveNickname()"><i class="fas fa-save"></i></button>
+                            </div>
+                        </div>
+                        <div class="profile-info-item">
+                            <label>Username</label>
+                            <input type="text" id="profileUsername" readonly>
+                        </div>
+                        <div class="profile-info-item">
+                            <label>Account Type</label>
+                            <input type="text" value="User" readonly>
+                        </div>
+                        <div class="profile-info-item">
+                            <label>Credits</label>
+                            <input type="text" id="profileCredits" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Change Password -->
+                <div class="profile-card">
+                    <h3 class="card-title"><i class="fas fa-key"></i> Change Password</h3>
+                    <div class="profile-info-item">
+                        <label>License Key (Required)</label>
+                        <input type="text" id="changeLicense" placeholder="Enter your license key">
+                    </div>
+                    <div class="profile-info-item">
+                        <label>New Password</label>
+                        <input type="password" id="changeNewPass" placeholder="Enter new password">
+                    </div>
+                    <div class="profile-info-item">
+                        <label>Confirm Password</label>
+                        <input type="password" id="changeConfirmPass" placeholder="Confirm new password">
+                    </div>
+                    <button class="save-btn" onclick="changePassword()">
+                        <i class="fas fa-save"></i> Update Password
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Modal -->
+    <div class="modal-overlay" id="supportModal" style="display:none;">
+        <div class="modal-box support-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-headset"></i> Support</h3>
+                <button onclick="closeSupport()" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="support-logo">
+                    <div class="logo-icon small">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>Trading Analyzer Support</h4>
+                </div>
+                <div class="support-options">
+                    <a href="#" class="support-option" id="ownerSupport">
+                        <div class="support-icon">👑</div>
+                        <div class="support-info">
+                            <h4>Owner Support</h4>
+                            <p>Direct owner contact</p>
+                        </div>
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                    <a href="#" class="support-option" id="altOwnerSupport">
+                        <div class="support-icon">🔹</div>
+                        <div class="support-info">
+                            <h4>Alternative Support</h4>
+                            <p>Alternative owner contact</p>
+                        </div>
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                    <a href="#" class="support-option" id="adminSupport">
+                        <div class="support-icon">🔧</div>
+                        <div class="support-info">
+                            <h4>Admin Support</h4>
+                            <p>Admin contact</p>
+                        </div>
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <div class="toast-icon" id="toastIcon"></div>
+        <div class="toast-content">
+            <p id="toastMessage"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="user-dashboard.js"></script>
+</body>
+</html>
