@@ -1,5 +1,5 @@
 // ===== CONFIGURATION =====
-const API_URL = 'https://your-backend.koyeb.app'; // Replace after deploy
+const API_URL = 'https://trading-analyzer-hm0g.onrender.com/index.html'; // Replace after deploy
 
 // ===== LOGIN MODE =====
 let currentMode = 'user';
