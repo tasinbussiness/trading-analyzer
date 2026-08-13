@@ -13,7 +13,7 @@ import base64
 from functools import wraps
 
 # Import modules
-from database_setup import db, init_db
+from database_setup import init_db
 from license_system import LicenseManager
 from vision_ai import VisionAI
 from strategies import StrategyEngine
