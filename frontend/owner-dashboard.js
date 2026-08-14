@@ -2,6 +2,7 @@
 
 let selectedLicenseType = 'user';
 let selectedUserId = null;
+let selectedUserType = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     if (!checkAuth('owner')) return;
@@ -15,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadStrategySettings();
 });
 
-// ===== LOAD OWNER PROFILE =====
 async function loadOwnerProfile() {
     try {
         const response = await fetch(`${API_URL}/api/profile`, {
@@ -26,22 +26,37 @@ async function loadOwnerProfile() {
 
         const data = await response.json();
         if (data.success) {
-            document.getElementById('profileName').textContent = data.nickname || data.username;
-            document.getElementById('profileUsername').value = data.username;
-            document.getElementById('nickname').value = data.nickname || '';
+            const nameEl = document.getElementById('profileName');
+            const usernameEl = document.getElementById('profileUsername');
+            const nicknameEl = document.getElementById('nickname');
+            
+            if (nameEl) nameEl.textContent = data.nickname || data.username;
+            if (usernameEl) usernameEl.value = data.username;
+            if (nicknameEl) nicknameEl.value = data.nickname || '';
 
             if (data.avatar) {
-                document.getElementById('profileAvatarImg').src = data.avatar;
-                document.getElementById('profileAvatarImg').style.display = 'block';
-                document.getElementById('profileAvatarIcon').style.display = 'none';
+                const profileImg = document.getElementById('profileAvatarImg');
+                const profileIcon = document.getElementById('profileAvatarIcon');
+                const topImg = document.getElementById('avatarImg');
+                const topIcon = document.getElementById('avatarIcon');
+                
+                if (profileImg) {
+                    profileImg.src = data.avatar;
+                    profileImg.style.display = 'block';
+                }
+                if (profileIcon) profileIcon.style.display = 'none';
+                if (topImg) {
+                    topImg.src = data.avatar;
+                    topImg.style.display = 'block';
+                }
+                if (topIcon) topIcon.style.display = 'none';
             }
         }
     } catch (error) {
-        console.error('Profile load error:', error);
+        console.error('Profile error:', error);
     }
 }
 
-// ===== LOAD ADMINS =====
 async function loadAdmins() {
     try {
         const response = await fetch(`${API_URL}/api/owner/admins`, {
@@ -51,30 +66,30 @@ async function loadAdmins() {
         });
 
         const data = await response.json();
-        if (data.success) {
-            renderAdmins(data.admins);
-        }
+        if (data.success) renderAdmins(data.admins);
     } catch (error) {
-        console.error('Admins load error:', error);
+        console.error('Admins error:', error);
     }
 }
 
 function renderAdmins(admins) {
     const grid = document.getElementById('adminsGrid');
+    if (!grid) return;
+    
     grid.innerHTML = '';
 
     if (!admins || admins.length === 0) {
-        grid.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No admins found</p>';
+        grid.innerHTML = '<p style="color: rgba(200,220,255,0.5); text-align: center; grid-column: 1/-1;">No admins found</p>';
         return;
     }
 
     admins.forEach(admin => {
         const card = document.createElement('div');
         card.className = 'user-card';
-        card.onclick = () => showUserActionModal(admin);
+        card.onclick = () => showUserActionModal(admin, 'admin');
 
         card.innerHTML = `
-            <div class="user-card-avatar" style="background: linear-gradient(135deg, #6c63ff, #5a52d5);">
+            <div class="user-card-avatar">
                 ${admin.avatar ? `<img src="${admin.avatar}" alt="">` : '<i class="fas fa-user-shield"></i>'}
             </div>
             <div class="user-card-info">
@@ -88,14 +103,13 @@ function renderAdmins(admins) {
 }
 
 function searchAdmins(query) {
-    const cards = document.getElementById('adminsGrid').querySelectorAll('.user-card');
+    const cards = document.getElementById('adminsGrid')?.querySelectorAll('.user-card') || [];
     cards.forEach(card => {
         const name = card.querySelector('h4').textContent.toLowerCase();
         card.style.display = name.includes(query.toLowerCase()) ? 'flex' : 'none';
     });
 }
 
-// ===== ADD ADMIN =====
 async function showAddAdmin() {
     try {
         const response = await fetch(`${API_URL}/api/owner/generate-admin-license`, {
@@ -108,8 +122,6 @@ async function showAddAdmin() {
         if (data.success) {
             document.getElementById('adminLicenseKey').textContent = data.license_key;
             document.getElementById('addAdminModal').style.display = 'flex';
-        } else {
-            showToast(data.message || 'Failed!', 'error');
         }
     } catch (error) {
         showToast('Connection error!', 'error');
@@ -122,11 +134,11 @@ function closeAddAdmin() {
 
 function copyAdminLicense() {
     const key = document.getElementById('adminLicenseKey').textContent;
-    navigator.clipboard.writeText(key);
-    showToast('Admin license copied!', 'success');
+    navigator.clipboard.writeText(key).then(() => {
+        showToast('Admin license copied!', 'success');
+    });
 }
 
-// ===== LOAD ALL USERS =====
 async function loadAllUsers() {
     try {
         const response = await fetch(`${API_URL}/api/owner/all-users`, {
@@ -136,27 +148,27 @@ async function loadAllUsers() {
         });
 
         const data = await response.json();
-        if (data.success) {
-            renderAllUsers(data.users);
-        }
+        if (data.success) renderAllUsers(data.users);
     } catch (error) {
-        console.error('Users load error:', error);
+        console.error('Users error:', error);
     }
 }
 
 function renderAllUsers(users) {
     const grid = document.getElementById('usersGrid');
+    if (!grid) return;
+    
     grid.innerHTML = '';
 
     if (!users || users.length === 0) {
-        grid.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No users found</p>';
+        grid.innerHTML = '<p style="color: rgba(200,220,255,0.5); text-align: center; grid-column: 1/-1;">No users found</p>';
         return;
     }
 
     users.forEach(user => {
         const card = document.createElement('div');
         card.className = 'user-card';
-        card.onclick = () => showUserActionModal(user);
+        card.onclick = () => showUserActionModal(user, 'user');
 
         const statusClass = user.status === 'paused' ? 'paused' : user.status === 'banned' ? 'banned' : '';
 
@@ -175,24 +187,25 @@ function renderAllUsers(users) {
 }
 
 function searchUsers(query) {
-    const cards = document.getElementById('usersGrid').querySelectorAll('.user-card');
+    const cards = document.getElementById('usersGrid')?.querySelectorAll('.user-card') || [];
     cards.forEach(card => {
         const name = card.querySelector('h4').textContent.toLowerCase();
         card.style.display = name.includes(query.toLowerCase()) ? 'flex' : 'none';
     });
 }
 
-// ===== USER ACTION MODAL =====
-function showUserActionModal(user) {
+function showUserActionModal(user, type) {
     selectedUserId = user.id;
+    selectedUserType = type;
+    
     document.getElementById('userActionInfo').innerHTML = `
-        <div class="user-card-avatar" style="width:60px;height:60px;margin:0 auto 10px;border-radius:15px;background:linear-gradient(135deg,#6c63ff,#ff6584);display:flex;align-items:center;justify-content:center;font-size:24px;color:white;">
-            ${user.avatar ? `<img src="${user.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:15px;">` : '<i class="fas fa-user"></i>'}
+        <div class="user-card-avatar" style="width:60px;height:60px;margin:0 auto 10px;border-radius:15px;background:linear-gradient(135deg,#0077ff,#00b4ff);display:flex;align-items:center;justify-content:center;font-size:24px;color:white;overflow:hidden;">
+            ${user.avatar ? `<img src="${user.avatar}" style="width:100%;height:100%;object-fit:cover;">` : `<i class="fas fa-${type === 'admin' ? 'user-shield' : 'user'}"></i>`}
         </div>
         <h3 style="color:white;margin-bottom:5px;">${user.nickname || user.username}</h3>
-        <p style="color:var(--text-muted);font-size:13px;">Credits: ${user.credits} • Status: ${user.status || 'active'}</p>
+        <p style="color:rgba(200,220,255,0.6);font-size:13px;">Credits: ${user.credits || 0} • Status: ${user.status || 'active'}</p>
     `;
-    document.getElementById('modalCredits').value = user.credits;
+    document.getElementById('modalCredits').value = user.credits || 0;
     document.getElementById('creditModify').style.display = 'none';
     document.getElementById('userActionModal').style.display = 'flex';
 }
@@ -202,13 +215,8 @@ function closeUserAction() {
     selectedUserId = null;
 }
 
-async function pauseUser() {
-    await userAction('pause');
-}
-
-async function resumeUser() {
-    await userAction('resume');
-}
+async function pauseUser() { await userAction('pause'); }
+async function resumeUser() { await userAction('resume'); }
 
 async function deleteUser() {
     if (!confirm('Are you sure you want to delete this user?')) return;
@@ -238,8 +246,6 @@ async function saveModalCredits() {
             closeUserAction();
             loadAllUsers();
             loadAdmins();
-        } else {
-            showToast(data.message || 'Failed!', 'error');
         }
     } catch (error) {
         showToast('Connection error!', 'error');
@@ -264,15 +270,12 @@ async function userAction(action) {
             closeUserAction();
             loadAllUsers();
             loadAdmins();
-        } else {
-            showToast(data.message || 'Failed!', 'error');
         }
     } catch (error) {
         showToast('Connection error!', 'error');
     }
 }
 
-// ===== LOAD ALL STATS =====
 async function loadAllStats() {
     try {
         const response = await fetch(`${API_URL}/api/owner/stats`, {
@@ -283,29 +286,35 @@ async function loadAllStats() {
 
         const data = await response.json();
         if (data.success) {
-            document.getElementById('totalAnalysis').textContent = data.total || 0;
-            document.getElementById('todayAnalysis').textContent = data.today || 0;
-            document.getElementById('weekAnalysis').textContent = data.week || 0;
-            document.getElementById('monthAnalysis').textContent = data.month || 0;
-            document.getElementById('upCount').textContent = data.up || 0;
-            document.getElementById('downCount').textContent = data.down || 0;
-            document.getElementById('avoidCount').textContent = data.avoid || 0;
-            document.getElementById('totalUsers').textContent = data.total_users || 0;
+            const els = {
+                totalAnalysis: data.total || 0,
+                todayAnalysis: data.today || 0,
+                weekAnalysis: data.week || 0,
+                monthAnalysis: data.month || 0,
+                upCount: data.up || 0,
+                downCount: data.down || 0,
+                avoidCount: data.avoid || 0,
+                totalUsers: data.total_users || 0
+            };
+            
+            for (const [id, val] of Object.entries(els)) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val;
+            }
         }
     } catch (error) {
-        console.error('Stats load error:', error);
+        console.error('Stats error:', error);
     }
 }
 
-// ===== LICENSE MANAGER =====
 function selectLicenseType(type, element) {
     selectedLicenseType = type;
     document.querySelectorAll('.license-type-btn').forEach(b => b.classList.remove('active'));
-    element.classList.add('active');
+    if (element) element.classList.add('active');
 }
 
 async function generateLicense() {
-    const credits = document.getElementById('licenseCredits').value;
+    const credits = document.getElementById('licenseCredits')?.value || 50;
 
     try {
         const response = await fetch(`${API_URL}/api/owner/generate-license`, {
@@ -324,8 +333,6 @@ async function generateLicense() {
             document.getElementById('licenseKeyOutput').textContent = data.license_key;
             showToast('License generated!', 'success');
             loadAllLicenses();
-        } else {
-            showToast(data.message || 'Failed!', 'error');
         }
     } catch (error) {
         showToast('Connection error!', 'error');
@@ -334,8 +341,9 @@ async function generateLicense() {
 
 function copyLicense() {
     const key = document.getElementById('licenseKeyOutput').textContent;
-    navigator.clipboard.writeText(key);
-    showToast('License copied!', 'success');
+    navigator.clipboard.writeText(key).then(() => {
+        showToast('License copied!', 'success');
+    });
 }
 
 async function loadAllLicenses() {
@@ -349,20 +357,27 @@ async function loadAllLicenses() {
         const data = await response.json();
         if (data.success) {
             const tbody = document.getElementById('licenseList');
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
+            
+            if (data.licenses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: rgba(200,220,255,0.5);">No licenses yet</td></tr>';
+                return;
+            }
 
             data.licenses.forEach(license => {
-                const statusColor = license.status === 'used' ? '#00d084' :
-                                   license.status === 'unused' ? '#ffb800' : '#ff4757';
+                const statusColor = license.status === 'used' ? '#00ff88' :
+                                   license.status === 'unused' ? '#ffb800' : '#ff3b5c';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><code style="color: #ffb800;">${license.key}</code></td>
+                    <td><code style="color: #00b4ff;">${license.key}</code></td>
                     <td>${license.type}</td>
                     <td style="color: ${statusColor};">${license.status}</td>
                     <td>${license.credits}</td>
                     <td>${license.used_by || '-'}</td>
                     <td>
-                        <button onclick="deleteLicense('${license.key}')" style="background:rgba(255,71,87,0.15);border:none;color:#ff4757;padding:6px 12px;border-radius:8px;cursor:pointer;">
+                        <button onclick="deleteLicense('${license.key}')" style="background:rgba(255,59,92,0.15);border:none;color:#ff3b5c;padding:6px 12px;border-radius:8px;cursor:pointer;">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -371,7 +386,7 @@ async function loadAllLicenses() {
             });
         }
     } catch (error) {
-        console.error('Licenses load error:', error);
+        console.error('Licenses error:', error);
     }
 }
 
@@ -392,18 +407,15 @@ async function deleteLicense(key) {
         if (data.success) {
             showToast('License deleted!', 'success');
             loadAllLicenses();
-        } else {
-            showToast(data.message || 'Failed!', 'error');
         }
     } catch (error) {
         showToast('Connection error!', 'error');
     }
 }
 
-// ===== NOTICE SYSTEM =====
 async function sendNotice() {
-    const title = document.getElementById('noticeTitle').value.trim();
-    const message = document.getElementById('noticeMessage').value.trim();
+    const title = document.getElementById('noticeTitle')?.value.trim();
+    const message = document.getElementById('noticeMessage')?.value.trim();
 
     if (!title || !message) {
         showToast('Please fill in title and message!', 'error');
@@ -418,8 +430,8 @@ async function sendNotice() {
                 token: localStorage.getItem('token'),
                 title: title,
                 message: message,
-                all: document.getElementById('noticeAll').checked,
-                admins_only: document.getElementById('noticeAdmins').checked
+                all: document.getElementById('noticeAll')?.checked || false,
+                admins_only: document.getElementById('noticeAdmins')?.checked || false
             })
         });
 
@@ -429,8 +441,6 @@ async function sendNotice() {
             document.getElementById('noticeTitle').value = '';
             document.getElementById('noticeMessage').value = '';
             loadNoticeHistory();
-        } else {
-            showToast(data.message || 'Failed!', 'error');
         }
     } catch (error) {
         showToast('Connection error!', 'error');
@@ -448,10 +458,12 @@ async function loadNoticeHistory() {
         const data = await response.json();
         if (data.success) {
             const container = document.getElementById('noticeHistory');
+            if (!container) return;
+            
             container.innerHTML = '';
 
             if (!data.notices || data.notices.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">No notices sent yet</p>';
+                container.innerHTML = '<p style="color:rgba(200,220,255,0.5);text-align:center;">No notices sent yet</p>';
                 return;
             }
 
@@ -467,11 +479,10 @@ async function loadNoticeHistory() {
             });
         }
     } catch (error) {
-        console.error('Notice history error:', error);
+        console.error('Notices error:', error);
     }
 }
 
-// ===== STRATEGY CONTROL =====
 async function loadStrategySettings() {
     try {
         const response = await fetch(`${API_URL}/api/owner/strategies`, {
@@ -488,7 +499,7 @@ async function loadStrategySettings() {
             });
         }
     } catch (error) {
-        console.error('Strategy load error:', error);
+        console.error('Strategies error:', error);
     }
 }
 
@@ -511,19 +522,16 @@ async function saveStrategies() {
         const data = await response.json();
         if (data.success) {
             showToast('Strategy settings saved!', 'success');
-        } else {
-            showToast(data.message || 'Failed!', 'error');
         }
     } catch (error) {
         showToast('Connection error!', 'error');
     }
 }
 
-// ===== OWNER CHANGE PASSWORD =====
 async function changeOwnerPassword() {
-    const currentPass = document.getElementById('currentPass').value;
-    const newPass = document.getElementById('changeNewPass').value;
-    const confirmPass = document.getElementById('changeConfirmPass').value;
+    const currentPass = document.getElementById('currentPass')?.value;
+    const newPass = document.getElementById('changeNewPass')?.value;
+    const confirmPass = document.getElementById('changeConfirmPass')?.value;
 
     if (!currentPass || !newPass || !confirmPass) {
         showToast('Please fill in all fields!', 'error');
