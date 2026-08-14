@@ -70,93 +70,112 @@
         </div>
 
         <div class="page active" id="page-analyzer">
-            <div class="page-header">
-                <h1><i class="fas fa-robot"></i> AI Analyzer</h1>
-                <p>Admin Analyzer - Unlimited Access</p>
-            </div>
+            <div class="analyzer-layout">
+                <div class="section-card">
+                    <div class="section-title">
+                        <span class="dot"></span>
+                        <span>📊 Upload Chart Screenshot</span>
+                    </div>
 
-            <div class="upload-container" id="uploadContainer">
-                <div class="upload-box" id="uploadBox" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                    <div class="upload-content" id="uploadContent">
-                        <div class="upload-icon">
-                            <i class="fas fa-cloud-upload-alt"></i>
+                    <div class="upload-box" id="uploadBox" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <div class="upload-content" id="uploadContent">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h3>Drop Chart Here</h3>
+                            <p>Click • Drag & Drop • Paste (Ctrl+V)</p>
+                            <div class="upload-formats">
+                                <span>PNG</span>
+                                <span>JPG</span>
+                                <span>JPEG</span>
+                            </div>
                         </div>
-                        <h3>Drop Chart Screenshot Here</h3>
-                        <p>Auto-analyze on upload • Drag & Drop • Paste (Ctrl+V)</p>
-                        <div class="upload-formats">
-                            <span>PNG</span>
-                            <span>JPG</span>
-                            <span>JPEG</span>
+                        <div class="upload-preview" id="uploadPreview" style="display:none;">
+                            <img id="previewImg" src="" alt="Preview" onclick="triggerFileInput(event)">
+                            <div class="change-image-text">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Click image or paste new to change</span>
+                            </div>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)" style="display:none;">
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-title">
+                        <span class="dot"></span>
+                        <span>🎯 Signal Output</span>
+                    </div>
+
+                    <div class="signal-output-box" id="signalOutputBox">
+                        <div class="signal-placeholder" id="signalPlaceholder">
+                            <i class="fas fa-satellite-dish"></i>
+                            <p>Upload chart to get signal</p>
+                        </div>
+
+                        <div class="processing-container" id="processingContainer" style="display:none;">
+                            <div class="processing-circle">
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" class="circle-bg"/>
+                                    <circle cx="50" cy="50" r="45" class="circle-progress" id="progressCircle"/>
+                                </svg>
+                                <div class="processing-percent" id="processPercent">0%</div>
+                            </div>
+                            <h3 class="processing-text" id="processingText">Analyzing...</h3>
+                            <div class="processing-steps">
+                                <div class="step" id="step1"><i class="fas fa-circle"></i><span>Reading Chart</span></div>
+                                <div class="step" id="step2"><i class="fas fa-circle"></i><span>Detecting Patterns</span></div>
+                                <div class="step" id="step3"><i class="fas fa-circle"></i><span>Applying Strategies</span></div>
+                                <div class="step" id="step4"><i class="fas fa-circle"></i><span>Generating Signal</span></div>
+                            </div>
+                        </div>
+
+                        <div class="big-signal-container" id="resultContainer" style="display:none;">
+                            <div class="signal-big-btn" id="signalBigBtn">
+                                <i class="fas fa-arrow-up" id="signalArrow"></i>
+                            </div>
+                            <div class="signal-label" id="signalLabel">
+                                <span id="signalIcon"></span>
+                                <span id="signalText"></span>
+                            </div>
+                            <div class="signal-direction-text">Signal Direction</div>
+
+                            <div class="signal-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value confidence" id="resultConfidence">0%</div>
+                                    <div class="stat-label">Confidence</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value market" id="resultStrength">0%</div>
+                                    <div class="stat-label">Market Strength</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value risk-low" id="resultRisk">LOW</div>
+                                    <div class="stat-label">Risk Level</div>
+                                </div>
+                            </div>
+
+                            <div class="non-mtg-badge">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>NON-MTG STRATEGY • NO MARTINGALE</span>
+                            </div>
+
+                            <div class="strategies-applied">
+                                <div class="strategies-applied-title">
+                                    <i class="fas fa-chess"></i>
+                                    <span id="strategiesTitle">STRATEGIES APPLIED (0)</span>
+                                </div>
+                                <div id="strategiesRows"></div>
+                            </div>
+                        </div>
+
+                        <div class="warning-container" id="warningContainer" style="display:none;">
+                            <div class="warning-icon">⚠️</div>
+                            <h3 id="warningTitle">Warning</h3>
+                            <p id="warningMessage"></p>
                         </div>
                     </div>
-                    <div class="upload-preview" id="uploadPreview" style="display:none;">
-                        <img id="previewImg" src="" alt="Preview">
-                        <button class="remove-img" onclick="removeImage(event)">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)" style="display:none;">
                 </div>
-            </div>
-
-            <div class="processing-container" id="processingContainer" style="display:none;">
-                <div class="processing-animation">
-                    <div class="processing-circle">
-                        <svg viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="45" class="circle-bg"/>
-                            <circle cx="50" cy="50" r="45" class="circle-progress" id="progressCircle"/>
-                        </svg>
-                        <div class="processing-percent" id="processPercent">0%</div>
-                    </div>
-                </div>
-                <h3 class="processing-text" id="processingText">Analyzing Chart...</h3>
-                <div class="processing-steps">
-                    <div class="step" id="step1"><i class="fas fa-circle"></i><span>Reading Chart</span></div>
-                    <div class="step" id="step2"><i class="fas fa-circle"></i><span>Detecting Patterns</span></div>
-                    <div class="step" id="step3"><i class="fas fa-circle"></i><span>Applying Strategies</span></div>
-                    <div class="step" id="step4"><i class="fas fa-circle"></i><span>Generating Signal</span></div>
-                </div>
-            </div>
-
-            <div class="result-container" id="resultContainer" style="display:none;">
-                <div class="result-header" id="resultHeader">
-                    <div class="result-signal" id="resultSignal">
-                        <span class="signal-icon" id="signalIcon"></span>
-                        <span class="signal-text" id="signalText"></span>
-                    </div>
-                </div>
-                <div class="result-grid">
-                    <div class="result-card">
-                        <div class="result-card-label">Confidence</div>
-                        <div class="result-card-value" id="resultConfidence">0%</div>
-                        <div class="result-card-bar"><div class="bar-fill" id="confidenceBar"></div></div>
-                    </div>
-                    <div class="result-card">
-                        <div class="result-card-label">Risk Level</div>
-                        <div class="result-card-value" id="resultRisk">Low</div>
-                        <div class="result-card-bar"><div class="bar-fill" id="riskBar"></div></div>
-                    </div>
-                    <div class="result-card">
-                        <div class="result-card-label">Market Strength</div>
-                        <div class="result-card-value" id="resultStrength">0%</div>
-                        <div class="result-card-bar"><div class="bar-fill" id="strengthBar"></div></div>
-                    </div>
-                </div>
-                <div class="strategy-list">
-                    <h4><i class="fas fa-chess"></i> Matched Strategies</h4>
-                    <div id="strategyTags" class="strategy-tags"></div>
-                </div>
-                <div class="result-note" id="resultNote"></div>
-                <button class="new-analysis-btn" onclick="resetAnalysis()">
-                    <i class="fas fa-redo"></i> New Analysis
-                </button>
-            </div>
-
-            <div class="warning-container" id="warningContainer" style="display:none;">
-                <div class="warning-icon">⚠️</div>
-                <h3 id="warningTitle">Warning</h3>
-                <p id="warningMessage"></p>
-                <button class="new-analysis-btn" onclick="resetAnalysis()"><i class="fas fa-redo"></i> Try Again</button>
             </div>
         </div>
 
@@ -165,14 +184,12 @@
                 <h1><i class="fas fa-users-cog"></i> User Control</h1>
                 <p>Manage all users</p>
             </div>
-
             <div class="control-actions">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
                     <input type="text" id="userSearch" placeholder="Search users..." oninput="searchUsers()">
                 </div>
             </div>
-
             <div class="users-grid" id="usersGrid"></div>
         </div>
 
@@ -197,11 +214,9 @@
                     </p>
                 </div>
 
-                <div class="license-options">
-                    <div class="profile-info-item">
-                        <label>Credits Amount</label>
-                        <input type="number" id="licenseCredits" value="50" min="1" max="1000">
-                    </div>
+                <div class="profile-info-item">
+                    <label>Credits Amount</label>
+                    <input type="number" id="licenseCredits" value="50" min="1" max="1000">
                 </div>
 
                 <button class="save-btn" onclick="generateLicense()">
@@ -293,22 +308,20 @@
                         <span class="profile-badge">🔧 Admin</span>
                     </div>
 
-                    <div class="profile-info-grid">
-                        <div class="profile-info-item">
-                            <label>Nickname</label>
-                            <div class="profile-input-group">
-                                <input type="text" id="nickname" placeholder="Set nickname">
-                                <button onclick="saveNickname()"><i class="fas fa-save"></i></button>
-                            </div>
+                    <div class="profile-info-item">
+                        <label>Nickname</label>
+                        <div class="profile-input-group">
+                            <input type="text" id="nickname" placeholder="Set nickname">
+                            <button onclick="saveNickname()"><i class="fas fa-save"></i></button>
                         </div>
-                        <div class="profile-info-item">
-                            <label>Username</label>
-                            <input type="text" id="profileUsername" readonly>
-                        </div>
-                        <div class="profile-info-item">
-                            <label>Account Type</label>
-                            <input type="text" value="Admin" readonly>
-                        </div>
+                    </div>
+                    <div class="profile-info-item">
+                        <label>Username</label>
+                        <input type="text" id="profileUsername" readonly>
+                    </div>
+                    <div class="profile-info-item">
+                        <label>Account Type</label>
+                        <input type="text" value="Admin" readonly>
                     </div>
                 </div>
 
