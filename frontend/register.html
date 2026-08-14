@@ -3,87 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Analyzer - Register</title>
+    <title>Struggle AI - Register</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://i.imgur.com/MQXgZBV.png" type="image/png">
 </head>
 <body class="login-body">
-    <!-- Animated Background -->
+
+    <!-- Chart Background Animation -->
     <div class="bg-animation">
-        <div class="bg-circle circle1"></div>
-        <div class="bg-circle circle2"></div>
-        <div class="bg-circle circle3"></div>
-        <div class="particles" id="particles"></div>
+        <div class="chart-bg">
+            <svg class="chart-svg" viewBox="0 0 1200 600" preserveAspectRatio="none">
+                <path class="chart-line" d="M0,400 Q100,350 200,380 T400,300 T600,350 T800,250 T1000,280 T1200,200"/>
+                <path class="chart-line chart-line-2" d="M0,450 Q100,420 200,430 T400,380 T600,400 T800,350 T1000,370 T1200,300"/>
+                <path class="chart-line chart-line-3" d="M0,500 Q100,480 200,490 T400,450 T600,460 T800,420 T1000,440 T1200,380"/>
+            </svg>
+        </div>
+        <div class="candles-bg" id="candlesBg"></div>
+        <div class="bubbles" id="bubbles"></div>
     </div>
 
-    <!-- Register Container -->
     <div class="login-wrapper">
         <!-- Logo Section -->
         <div class="logo-section">
             <div class="logo-icon">
-                <i class="fas fa-chart-line"></i>
+                <img src="https://i.imgur.com/MQXgZBV.png" alt="Struggle AI">
             </div>
-            <h1 class="logo-title">Trading Analyzer</h1>
+            <h1 class="logo-title">STRUGGLE <span class="ai">AI</span></h1>
             <p class="logo-subtitle">Create Your Account</p>
         </div>
 
         <!-- Register Card -->
         <div class="login-card">
             <div class="login-card-header">
+                <i class="fas fa-user-plus header-icon"></i>
                 <h2>Create Account</h2>
-                <p>Fill in the details to get started</p>
             </div>
 
             <form class="login-form" onsubmit="handleRegister(event)">
                 <div class="input-group">
-                    <div class="input-icon">
-                        <i class="fas fa-id-card"></i>
+                    <label class="input-label">License Key</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <input type="text" id="licenseKey" placeholder="Enter License Key" required>
                     </div>
-                    <input type="text" id="licenseKey" placeholder="Enter License Key" required>
-                    <div class="input-line"></div>
                 </div>
 
                 <div class="input-group">
-                    <div class="input-icon">
-                        <i class="fas fa-user"></i>
+                    <label class="input-label">Username</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <input type="text" id="regUsername" placeholder="Choose Username" required>
                     </div>
-                    <input type="text" id="regUsername" placeholder="Choose Username" required>
-                    <div class="input-line"></div>
                 </div>
 
                 <div class="input-group">
-                    <div class="input-icon">
-                        <i class="fas fa-lock"></i>
+                    <label class="input-label">Password</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <input type="password" id="regPassword" placeholder="Choose Password" required>
+                        <button type="button" class="toggle-password" onclick="toggleRegPassword()">
+                            <i class="fas fa-eye" id="regEyeIcon"></i>
+                        </button>
                     </div>
-                    <input type="password" id="regPassword" placeholder="Choose Password" required>
-                    <button type="button" class="toggle-password" onclick="toggleRegPassword()">
-                        <i class="fas fa-eye" id="regEyeIcon"></i>
-                    </button>
-                    <div class="input-line"></div>
                 </div>
 
                 <div class="license-info">
                     <i class="fas fa-info-circle"></i>
-                    <span>License key is required. Contact admin to get one.</span>
+                    <span>License required. Contact admin to get one.</span>
                 </div>
 
                 <button type="submit" class="login-btn" id="registerBtn">
-                    <span class="btn-text">Create Account</span>
+                    <span class="btn-text">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                        <i class="fas fa-arrow-right"></i>
+                    </span>
                     <div class="btn-loader" style="display:none;">
                         <div class="spinner"></div>
                     </div>
-                    <i class="fas fa-arrow-right btn-arrow"></i>
                 </button>
 
                 <div class="register-link">
-                    <p>Already have an account? <a href="index.html">Login Here</a></p>
+                    Already have account? <a href="index.html">Login Here</a>
+                </div>
+
+                <div class="card-footer">
+                    <i class="fas fa-lock"></i>
+                    <span>Secured by Struggle AI</span>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast -->
     <div class="toast" id="toast">
         <div class="toast-icon" id="toastIcon"></div>
         <div class="toast-content">
@@ -92,5 +112,38 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        function createCandles() {
+            const container = document.getElementById('candlesBg');
+            if (!container) return;
+            for (let i = 0; i < 40; i++) {
+                const candle = document.createElement('div');
+                candle.className = 'candle' + (Math.random() > 0.5 ? '' : ' red');
+                candle.style.height = (Math.random() * 100 + 20) + 'px';
+                candle.style.animationDelay = (Math.random() * 4) + 's';
+                candle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                container.appendChild(candle);
+            }
+        }
+
+        function createBubbles() {
+            const container = document.getElementById('bubbles');
+            if (!container) return;
+            for (let i = 0; i < 25; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 12 + 4;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.animationDuration = (Math.random() * 15 + 10) + 's';
+                bubble.style.animationDelay = (Math.random() * 10) + 's';
+                container.appendChild(bubble);
+            }
+        }
+
+        createCandles();
+        createBubbles();
+    </script>
 </body>
 </html>
