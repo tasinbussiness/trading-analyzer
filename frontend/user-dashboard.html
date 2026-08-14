@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Analyzer - User Dashboard</title>
+    <title>Struggle AI - User Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://i.imgur.com/MQXgZBV.png" type="image/png">
 </head>
 <body class="dashboard-body">
 
@@ -15,9 +16,9 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
-                <i class="fas fa-chart-line"></i>
+                <img src="https://i.imgur.com/MQXgZBV.png" alt="Struggle AI">
             </div>
-            <h3>Trading Analyzer</h3>
+            <h3>STRUGGLE AI</h3>
             <p class="sidebar-role">👤 User Panel</p>
         </div>
 
@@ -55,10 +56,14 @@
             <button class="menu-toggle" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
+            <div class="topbar-logo-mini">
+                <img src="https://i.imgur.com/MQXgZBV.png" alt="Logo">
+                <span>STRUGGLE AI</span>
+            </div>
             <div class="topbar-right">
                 <div class="credit-display" id="creditDisplay">
                     <i class="fas fa-coins"></i>
-                    <span id="creditCount">50</span>
+                    <span id="creditCount">0</span>
                 </div>
                 <div class="user-avatar" id="userAvatar">
                     <img src="" alt="" id="avatarImg" style="display:none;">
@@ -78,14 +83,14 @@
         <div class="page active" id="page-analyzer">
             <div class="page-header">
                 <h1><i class="fas fa-robot"></i> AI Analyzer</h1>
-                <p>Upload chart screenshot for analysis</p>
+                <p>Upload chart screenshot for professional analysis</p>
             </div>
 
             <!-- Credit Bar -->
             <div class="credit-bar-container">
                 <div class="credit-bar-header">
                     <span>Credits Remaining</span>
-                    <span id="creditText">50 / 50</span>
+                    <span id="creditText">0 / 0</span>
                 </div>
                 <div class="credit-bar">
                     <div class="credit-bar-fill" id="creditBarFill" style="width: 100%"></div>
@@ -93,14 +98,14 @@
             </div>
 
             <!-- Upload Box -->
-            <div class="upload-container">
+            <div class="upload-container" id="uploadContainer">
                 <div class="upload-box" id="uploadBox" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
                     <div class="upload-content" id="uploadContent">
                         <div class="upload-icon">
                             <i class="fas fa-cloud-upload-alt"></i>
                         </div>
                         <h3>Drop Chart Screenshot Here</h3>
-                        <p>or click to browse • Paste with Ctrl+V</p>
+                        <p>Click to browse • Drag & Drop • Paste (Ctrl+V)</p>
                         <div class="upload-formats">
                             <span>PNG</span>
                             <span>JPG</span>
@@ -109,7 +114,7 @@
                     </div>
                     <div class="upload-preview" id="uploadPreview" style="display:none;">
                         <img id="previewImg" src="" alt="Preview">
-                        <button class="remove-img" onclick="removeImage()">
+                        <button class="remove-img" onclick="removeImage(event)">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -136,7 +141,7 @@
                 <h3 class="processing-text" id="processingText">Analyzing Chart...</h3>
                 <div class="processing-steps">
                     <div class="step" id="step1">
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-circle"></i>
                         <span>Reading Chart</span>
                     </div>
                     <div class="step" id="step2">
@@ -262,7 +267,6 @@
                 </div>
             </div>
 
-            <!-- Recent Analysis Table -->
             <div class="data-table-container">
                 <h3><i class="fas fa-history"></i> Recent Analysis</h3>
                 <div class="table-wrapper">
@@ -276,8 +280,7 @@
                                 <th>Risk</th>
                             </tr>
                         </thead>
-                        <tbody id="analysisHistory">
-                        </tbody>
+                        <tbody id="analysisHistory"></tbody>
                     </table>
                 </div>
             </div>
@@ -328,7 +331,6 @@
                     </div>
                 </div>
 
-                <!-- Change Password -->
                 <div class="profile-card">
                     <h3 class="card-title"><i class="fas fa-key"></i> Change Password</h3>
                     <div class="profile-info-item">
@@ -362,13 +364,13 @@
             </div>
             <div class="modal-body">
                 <div class="support-logo">
-                    <div class="logo-icon small">
-                        <i class="fas fa-chart-line"></i>
+                    <div class="sidebar-logo" style="width:60px;height:60px;margin:0 auto 10px;">
+                        <img src="https://i.imgur.com/MQXgZBV.png" alt="Struggle AI">
                     </div>
-                    <h4>Trading Analyzer Support</h4>
+                    <h4>Struggle AI Support</h4>
                 </div>
                 <div class="support-options">
-                    <a href="#" class="support-option" id="ownerSupport">
+                    <a href="#" class="support-option" id="ownerSupport" target="_blank">
                         <div class="support-icon">👑</div>
                         <div class="support-info">
                             <h4>Owner Support</h4>
@@ -376,7 +378,7 @@
                         </div>
                         <i class="fas fa-external-link-alt"></i>
                     </a>
-                    <a href="#" class="support-option" id="altOwnerSupport">
+                    <a href="#" class="support-option" id="altOwnerSupport" target="_blank">
                         <div class="support-icon">🔹</div>
                         <div class="support-info">
                             <h4>Alternative Support</h4>
@@ -384,7 +386,7 @@
                         </div>
                         <i class="fas fa-external-link-alt"></i>
                     </a>
-                    <a href="#" class="support-option" id="adminSupport">
+                    <a href="#" class="support-option" id="adminSupport" target="_blank">
                         <div class="support-icon">🔧</div>
                         <div class="support-info">
                             <h4>Admin Support</h4>
@@ -397,10 +399,8 @@
         </div>
     </div>
 
-    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-    <!-- Toast -->
     <div class="toast" id="toast">
         <div class="toast-icon" id="toastIcon"></div>
         <div class="toast-content">
@@ -409,6 +409,7 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="dashboard-common.js"></script>
     <script src="user-dashboard.js"></script>
 </body>
 </html>
