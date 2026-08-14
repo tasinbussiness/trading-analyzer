@@ -19,21 +19,34 @@ async function loadUserProfile() {
 
         const data = await response.json();
         if (data.success) {
-            document.getElementById('profileName').textContent = data.nickname || data.username;
-            document.getElementById('profileUsername').value = data.username;
-            document.getElementById('profileCredits').value = data.credits;
-            document.getElementById('nickname').value = data.nickname || '';
+            const nameEl = document.getElementById('profileName');
+            const usernameEl = document.getElementById('profileUsername');
+            const creditsEl = document.getElementById('profileCredits');
+            const nicknameEl = document.getElementById('nickname');
+            
+            if (nameEl) nameEl.textContent = data.nickname || data.username;
+            if (usernameEl) usernameEl.value = data.username;
+            if (creditsEl) creditsEl.value = data.credits;
+            if (nicknameEl) nicknameEl.value = data.nickname || '';
 
             updateCreditBar(data.credits, data.max_credits);
 
             if (data.avatar) {
-                document.getElementById('profileAvatarImg').src = data.avatar;
-                document.getElementById('profileAvatarImg').style.display = 'block';
-                document.getElementById('profileAvatarIcon').style.display = 'none';
-
-                document.getElementById('avatarImg').src = data.avatar;
-                document.getElementById('avatarImg').style.display = 'block';
-                document.getElementById('avatarIcon').style.display = 'none';
+                const profileImg = document.getElementById('profileAvatarImg');
+                const profileIcon = document.getElementById('profileAvatarIcon');
+                const topImg = document.getElementById('avatarImg');
+                const topIcon = document.getElementById('avatarIcon');
+                
+                if (profileImg) {
+                    profileImg.src = data.avatar;
+                    profileImg.style.display = 'block';
+                }
+                if (profileIcon) profileIcon.style.display = 'none';
+                if (topImg) {
+                    topImg.src = data.avatar;
+                    topImg.style.display = 'block';
+                }
+                if (topIcon) topIcon.style.display = 'none';
             }
         }
     } catch (error) {
@@ -52,14 +65,20 @@ async function loadUserStats() {
 
         const data = await response.json();
         if (data.success) {
-            document.getElementById('totalAnalysis').textContent = data.total || 0;
-            document.getElementById('todayAnalysis').textContent = data.today || 0;
-            document.getElementById('monthAnalysis').textContent = data.month || 0;
-            document.getElementById('avoidCount').textContent = data.avoid || 0;
-            document.getElementById('upCount').textContent = data.up || 0;
-            document.getElementById('downCount').textContent = data.down || 0;
+            const els = {
+                totalAnalysis: data.total || 0,
+                todayAnalysis: data.today || 0,
+                monthAnalysis: data.month || 0,
+                avoidCount: data.avoid || 0,
+                upCount: data.up || 0,
+                downCount: data.down || 0
+            };
+            
+            for (const [id, val] of Object.entries(els)) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val;
+            }
 
-            // Load history
             loadAnalysisHistory(data.history || []);
         }
     } catch (error) {
@@ -67,20 +86,21 @@ async function loadUserStats() {
     }
 }
 
-// ===== LOAD HISTORY =====
 function loadAnalysisHistory(history) {
     const tbody = document.getElementById('analysisHistory');
+    if (!tbody) return;
+    
     tbody.innerHTML = '';
 
     if (history.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No analysis yet</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: rgba(200,220,255,0.5);">No analysis yet</td></tr>';
         return;
     }
 
     history.forEach((item, index) => {
         const tr = document.createElement('tr');
-        const signalColor = item.signal.includes('BUY') ? '#00d084' :
-                           item.signal.includes('SELL') ? '#ff4757' : '#ffb800';
+        const signalColor = item.signal.includes('BUY') ? '#00ff88' :
+                           item.signal.includes('SELL') ? '#ff3b5c' : '#ffb800';
 
         tr.innerHTML = `
             <td>${index + 1}</td>
@@ -93,7 +113,6 @@ function loadAnalysisHistory(history) {
     });
 }
 
-// ===== LOAD NOTICE =====
 async function loadNotice() {
     try {
         const response = await fetch(`${API_URL}/api/get-notice`, {
@@ -104,26 +123,12 @@ async function loadNotice() {
 
         const data = await response.json();
         if (data.success && data.notice) {
-            document.getElementById('noticeBanner').style.display = 'flex';
-            document.getElementById('noticeText').textContent = data.notice;
+            const banner = document.getElementById('noticeBanner');
+            const text = document.getElementById('noticeText');
+            if (banner) banner.style.display = 'flex';
+            if (text) text.textContent = data.notice;
         }
     } catch (error) {
         console.error('Notice load error:', error);
-    }
-}
-
-// ===== LOAD SUPPORT LINKS =====
-async function loadSupportLinks() {
-    try {
-        const response = await fetch(`${API_URL}/api/support-links`);
-        const data = await response.json();
-
-        if (data.success) {
-            document.getElementById('ownerSupport').href = data.owner || '#';
-            document.getElementById('altOwnerSupport').href = data.alt_owner || '#';
-            document.getElementById('adminSupport').href = data.admin || '#';
-        }
-    } catch (error) {
-        console.error('Support links error:', error);
     }
 }
