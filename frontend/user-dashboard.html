@@ -77,11 +77,7 @@
 
         <!-- ===== ANALYZER PAGE ===== -->
         <div class="page active" id="page-analyzer">
-            <div class="page-header">
-                <h1><i class="fas fa-robot"></i> AI Analyzer</h1>
-                <p>Upload chart screenshot for automatic analysis</p>
-            </div>
-
+            <!-- Credit Bar -->
             <div class="credit-bar-container">
                 <div class="credit-bar-header">
                     <span>Credits Remaining</span>
@@ -92,100 +88,185 @@
                 </div>
             </div>
 
-            <div class="upload-container" id="uploadContainer">
-                <div class="upload-box" id="uploadBox" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                    <div class="upload-content" id="uploadContent">
-                        <div class="upload-icon">
-                            <i class="fas fa-cloud-upload-alt"></i>
+            <!-- Analyzer Layout (Chart + Signal) -->
+            <div class="analyzer-layout">
+                <!-- LEFT: Upload Chart -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <span class="dot"></span>
+                        <span>📊 Upload Chart Screenshot</span>
+                    </div>
+
+                    <div class="upload-box" id="uploadBox" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <div class="upload-content" id="uploadContent">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h3>Drop Chart Here</h3>
+                            <p>Click • Drag & Drop • Paste (Ctrl+V)</p>
+                            <div class="upload-formats">
+                                <span>PNG</span>
+                                <span>JPG</span>
+                                <span>JPEG</span>
+                            </div>
                         </div>
-                        <h3>Drop Chart Screenshot Here</h3>
-                        <p>Auto-analyze on upload • Drag & Drop • Paste (Ctrl+V)</p>
-                        <div class="upload-formats">
-                            <span>PNG</span>
-                            <span>JPG</span>
-                            <span>JPEG</span>
+                        <div class="upload-preview" id="uploadPreview" style="display:none;">
+                            <img id="previewImg" src="" alt="Preview" onclick="triggerFileInput(event)">
+                            <div class="change-image-text">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Click image or paste new to change</span>
+                            </div>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)" style="display:none;">
+                    </div>
+                </div>
+
+                <!-- RIGHT: Signal Output -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <span class="dot"></span>
+                        <span>🎯 Signal Output</span>
+                    </div>
+
+                    <div class="signal-output-box" id="signalOutputBox">
+                        <!-- Placeholder -->
+                        <div class="signal-placeholder" id="signalPlaceholder">
+                            <i class="fas fa-satellite-dish"></i>
+                            <p>Upload chart to get signal</p>
+                        </div>
+
+                        <!-- Processing (hidden initially) -->
+                        <div class="processing-container" id="processingContainer" style="display:none;">
+                            <div class="processing-circle">
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" class="circle-bg"/>
+                                    <circle cx="50" cy="50" r="45" class="circle-progress" id="progressCircle"/>
+                                </svg>
+                                <div class="processing-percent" id="processPercent">0%</div>
+                            </div>
+                            <h3 class="processing-text" id="processingText">Analyzing...</h3>
+                            <div class="processing-steps">
+                                <div class="step" id="step1"><i class="fas fa-circle"></i><span>Reading Chart</span></div>
+                                <div class="step" id="step2"><i class="fas fa-circle"></i><span>Detecting Patterns</span></div>
+                                <div class="step" id="step3"><i class="fas fa-circle"></i><span>Applying Strategies</span></div>
+                                <div class="step" id="step4"><i class="fas fa-circle"></i><span>Generating Signal</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Result Box -->
+                        <div class="big-signal-container" id="resultContainer" style="display:none;">
+                            <div class="signal-big-btn" id="signalBigBtn">
+                                <i class="fas fa-arrow-up" id="signalArrow"></i>
+                            </div>
+                            <div class="signal-label" id="signalLabel">
+                                <span id="signalIcon"></span>
+                                <span id="signalText"></span>
+                            </div>
+                            <div class="signal-direction-text">Signal Direction</div>
+
+                            <!-- Stats -->
+                            <div class="signal-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value confidence" id="resultConfidence">0%</div>
+                                    <div class="stat-label">Confidence</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value market" id="resultStrength">0%</div>
+                                    <div class="stat-label">Market Strength</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value risk-low" id="resultRisk">LOW</div>
+                                    <div class="stat-label">Risk Level</div>
+                                </div>
+                            </div>
+
+                            <!-- Non-MTG Badge -->
+                            <div class="non-mtg-badge">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>NON-MTG STRATEGY • NO MARTINGALE</span>
+                            </div>
+
+                            <!-- Strategies Applied -->
+                            <div class="strategies-applied">
+                                <div class="strategies-applied-title">
+                                    <i class="fas fa-chess"></i>
+                                    <span id="strategiesTitle">STRATEGIES APPLIED (0)</span>
+                                </div>
+                                <div id="strategiesRows"></div>
+                            </div>
+                        </div>
+
+                        <!-- Warning Box -->
+                        <div class="warning-container" id="warningContainer" style="display:none;">
+                            <div class="warning-icon">⚠️</div>
+                            <h3 id="warningTitle">Warning</h3>
+                            <p id="warningMessage"></p>
                         </div>
                     </div>
-                    <div class="upload-preview" id="uploadPreview" style="display:none;">
-                        <img id="previewImg" src="" alt="Preview">
-                        <button class="remove-img" onclick="removeImage(event)">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)" style="display:none;">
                 </div>
             </div>
 
-            <div class="processing-container" id="processingContainer" style="display:none;">
-                <div class="processing-animation">
-                    <div class="processing-circle">
-                        <svg viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="45" class="circle-bg"/>
-                            <circle cx="50" cy="50" r="45" class="circle-progress" id="progressCircle"/>
-                        </svg>
-                        <div class="processing-percent" id="processPercent">0%</div>
-                    </div>
-                </div>
-                <h3 class="processing-text" id="processingText">Analyzing Chart...</h3>
-                <div class="processing-steps">
-                    <div class="step" id="step1"><i class="fas fa-circle"></i><span>Reading Chart</span></div>
-                    <div class="step" id="step2"><i class="fas fa-circle"></i><span>Detecting Patterns</span></div>
-                    <div class="step" id="step3"><i class="fas fa-circle"></i><span>Applying Strategies</span></div>
-                    <div class="step" id="step4"><i class="fas fa-circle"></i><span>Generating Signal</span></div>
-                </div>
-            </div>
-
-            <div class="result-container" id="resultContainer" style="display:none;">
-                <div class="result-header" id="resultHeader">
-                    <div class="result-signal" id="resultSignal">
-                        <span class="signal-icon" id="signalIcon"></span>
-                        <span class="signal-text" id="signalText"></span>
-                    </div>
+            <!-- Analyzer Rules Section -->
+            <div class="rules-section">
+                <div class="rules-header">
+                    <h2><i class="fas fa-book"></i> Analyzer Rules</h2>
+                    <p>Follow these rules strictly for best results</p>
                 </div>
 
-                <div class="result-grid">
-                    <div class="result-card">
-                        <div class="result-card-label">Confidence</div>
-                        <div class="result-card-value" id="resultConfidence">0%</div>
-                        <div class="result-card-bar">
-                            <div class="bar-fill" id="confidenceBar"></div>
-                        </div>
-                    </div>
-                    <div class="result-card">
-                        <div class="result-card-label">Risk Level</div>
-                        <div class="result-card-value" id="resultRisk">Low</div>
-                        <div class="result-card-bar">
-                            <div class="bar-fill" id="riskBar"></div>
-                        </div>
-                    </div>
-                    <div class="result-card">
-                        <div class="result-card-label">Market Strength</div>
-                        <div class="result-card-value" id="resultStrength">0%</div>
-                        <div class="result-card-bar">
-                            <div class="bar-fill" id="strengthBar"></div>
-                        </div>
-                    </div>
+                <div class="rule-item">
+                    <div class="rule-number">1</div>
+                    <div class="rule-text">Market% = ৮০%+ হতে হবে। মার্কেট পারসেন্টেজ ৮০% এর উপরে থাকতে হবে ট্রেড নেওয়ার আগে।</div>
                 </div>
 
-                <div class="strategy-list">
-                    <h4><i class="fas fa-chess"></i> Matched Strategies</h4>
-                    <div id="strategyTags" class="strategy-tags"></div>
+                <div class="rule-item">
+                    <div class="rule-number">2</div>
+                    <div class="rule-text">Market structure ক্লিয়ার হতে হবে। মার্কেট এর স্ট্রাকচার পরিষ্কার না থাকলে ট্রেড নেওয়া যাবে না।</div>
                 </div>
 
-                <div class="result-note" id="resultNote"></div>
+                <div class="rule-item">
+                    <div class="rule-number">3</div>
+                    <div class="rule-text">Market যদি বেশি volatile হয় তাহলে ট্রেড avoid করুন। অতিরিক্ত ভোলাটাইল মার্কেটে ট্রেড করবেন না।</div>
+                </div>
 
-                <button class="new-analysis-btn" onclick="resetAnalysis()">
-                    <i class="fas fa-redo"></i> New Analysis
-                </button>
-            </div>
+                <div class="rule-item">
+                    <div class="rule-number">4</div>
+                    <div class="rule-text">Market এ যদি recent doji, hammer, error candle তৈরি করে থাকে তাহলে avoid করতে হবে। এগুলো avoid না করলে loss হতে পারে।</div>
+                </div>
 
-            <div class="warning-container" id="warningContainer" style="display:none;">
-                <div class="warning-icon">⚠️</div>
-                <h3 id="warningTitle">Warning</h3>
-                <p id="warningMessage"></p>
-                <button class="new-analysis-btn" onclick="resetAnalysis()">
-                    <i class="fas fa-redo"></i> Try Again
-                </button>
+                <div class="rule-item">
+                    <div class="rule-number">5</div>
+                    <div class="rule-text">যদি উপরের সব rules গুলো ঠিক থাকে এবং market ভালো থাকে — তাহলে candle শেষ হওয়ার ১০-১৫ সেকেন্ড আগে chart এর screenshot upload করতে হবে।</div>
+                </div>
+
+                <div class="rule-item">
+                    <div class="rule-number">6</div>
+                    <div class="rule-text">Entry point এ entry নিতে হবে। তবে কেউ যদি safety নিতে চান, নিতে পারেন।</div>
+                </div>
+
+                <div class="rule-item">
+                    <div class="rule-number">7</div>
+                    <div class="rule-text">কোনো trade loss হলে MTG নিবেন না, normal amount এর trade করবেন। Back to back candle এ trade না করা ভালো। যদি টানা ২টা loss হয় তাহলে support এ msg দিবেন এবং কিছুক্ষণ trade নেওয়া বন্ধ রেখে market থেকে বের হয়ে যাবেন।</div>
+                </div>
+
+                <div class="rule-item">
+                    <div class="rule-number">8</div>
+                    <div class="rule-text">কেউ overtrade করবেন না এবং নিজের money management strictly follow করবেন।</div>
+                </div>
+
+                <div class="rule-item">
+                    <div class="rule-number">9</div>
+                    <div class="rule-text">Market যদি ভালো না থাকে তাহলে trade avoid করুন এবং ১-২ ঘণ্টা পর market check করুন।</div>
+                </div>
+
+                <div class="rule-item">
+                    <div class="rule-number">10</div>
+                    <div class="rule-text">Feedback regular share করবেন আমাকে। Loss হলেও share করবেন।</div>
+                </div>
+
+                <div class="rules-note">
+                    <strong>📌 Note:</strong>
+                    আপনাদের help করার জন্য আমরা আমাদের best try করছি। আপনি যদি rules follow করে trade করেন তাহলে আপনার টাকা loss হওয়া থেকে বেঁচে যাবে। তাই strictly rules follow করবেন।
+                </div>
             </div>
         </div>
 
@@ -199,45 +280,27 @@
             <div class="stats-grid">
                 <div class="stat-card stat-total">
                     <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
-                    <div class="stat-info">
-                        <h3 id="totalAnalysis">0</h3>
-                        <p>Total Analysis</p>
-                    </div>
+                    <div class="stat-info"><h3 id="totalAnalysis">0</h3><p>Total Analysis</p></div>
                 </div>
                 <div class="stat-card stat-today">
                     <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
-                    <div class="stat-info">
-                        <h3 id="todayAnalysis">0</h3>
-                        <p>Today</p>
-                    </div>
+                    <div class="stat-info"><h3 id="todayAnalysis">0</h3><p>Today</p></div>
                 </div>
                 <div class="stat-card stat-month">
                     <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
-                    <div class="stat-info">
-                        <h3 id="monthAnalysis">0</h3>
-                        <p>This Month</p>
-                    </div>
+                    <div class="stat-info"><h3 id="monthAnalysis">0</h3><p>This Month</p></div>
                 </div>
                 <div class="stat-card stat-avoid">
                     <div class="stat-icon"><i class="fas fa-ban"></i></div>
-                    <div class="stat-info">
-                        <h3 id="avoidCount">0</h3>
-                        <p>Avoid Signals</p>
-                    </div>
+                    <div class="stat-info"><h3 id="avoidCount">0</h3><p>Avoid Signals</p></div>
                 </div>
                 <div class="stat-card stat-up">
                     <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
-                    <div class="stat-info">
-                        <h3 id="upCount">0</h3>
-                        <p>Buy Signals</p>
-                    </div>
+                    <div class="stat-info"><h3 id="upCount">0</h3><p>Buy Signals</p></div>
                 </div>
                 <div class="stat-card stat-down">
                     <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
-                    <div class="stat-info">
-                        <h3 id="downCount">0</h3>
-                        <p>Sell Signals</p>
-                    </div>
+                    <div class="stat-info"><h3 id="downCount">0</h3><p>Sell Signals</p></div>
                 </div>
             </div>
 
@@ -282,26 +345,24 @@
                         <span class="profile-badge">👤 User</span>
                     </div>
 
-                    <div class="profile-info-grid">
-                        <div class="profile-info-item">
-                            <label>Nickname</label>
-                            <div class="profile-input-group">
-                                <input type="text" id="nickname" placeholder="Set nickname">
-                                <button onclick="saveNickname()"><i class="fas fa-save"></i></button>
-                            </div>
+                    <div class="profile-info-item">
+                        <label>Nickname</label>
+                        <div class="profile-input-group">
+                            <input type="text" id="nickname" placeholder="Set nickname">
+                            <button onclick="saveNickname()"><i class="fas fa-save"></i></button>
                         </div>
-                        <div class="profile-info-item">
-                            <label>Username</label>
-                            <input type="text" id="profileUsername" readonly>
-                        </div>
-                        <div class="profile-info-item">
-                            <label>Account Type</label>
-                            <input type="text" value="User" readonly>
-                        </div>
-                        <div class="profile-info-item">
-                            <label>Credits</label>
-                            <input type="text" id="profileCredits" readonly>
-                        </div>
+                    </div>
+                    <div class="profile-info-item">
+                        <label>Username</label>
+                        <input type="text" id="profileUsername" readonly>
+                    </div>
+                    <div class="profile-info-item">
+                        <label>Account Type</label>
+                        <input type="text" value="User" readonly>
+                    </div>
+                    <div class="profile-info-item">
+                        <label>Credits</label>
+                        <input type="text" id="profileCredits" readonly>
                     </div>
                 </div>
 
