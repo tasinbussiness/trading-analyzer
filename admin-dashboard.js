@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadCreditUsers();
 });
 
-// ===== LOAD ADMIN PROFILE =====
 async function loadAdminProfile() {
     try {
         const response = await fetch(`${API_URL}/api/profile`, {
@@ -22,18 +21,30 @@ async function loadAdminProfile() {
 
         const data = await response.json();
         if (data.success) {
-            document.getElementById('profileName').textContent = data.nickname || data.username;
-            document.getElementById('profileUsername').value = data.username;
-            document.getElementById('nickname').value = data.nickname || '';
+            const nameEl = document.getElementById('profileName');
+            const usernameEl = document.getElementById('profileUsername');
+            const nicknameEl = document.getElementById('nickname');
+            
+            if (nameEl) nameEl.textContent = data.nickname || data.username;
+            if (usernameEl) usernameEl.value = data.username;
+            if (nicknameEl) nicknameEl.value = data.nickname || '';
 
             if (data.avatar) {
-                document.getElementById('profileAvatarImg').src = data.avatar;
-                document.getElementById('profileAvatarImg').style.display = 'block';
-                document.getElementById('profileAvatarIcon').style.display = 'none';
-
-                document.getElementById('avatarImg').src = data.avatar;
-                document.getElementById('avatarImg').style.display = 'block';
-                document.getElementById('avatarIcon').style.display = 'none';
+                const profileImg = document.getElementById('profileAvatarImg');
+                const profileIcon = document.getElementById('profileAvatarIcon');
+                const topImg = document.getElementById('avatarImg');
+                const topIcon = document.getElementById('avatarIcon');
+                
+                if (profileImg) {
+                    profileImg.src = data.avatar;
+                    profileImg.style.display = 'block';
+                }
+                if (profileIcon) profileIcon.style.display = 'none';
+                if (topImg) {
+                    topImg.src = data.avatar;
+                    topImg.style.display = 'block';
+                }
+                if (topIcon) topIcon.style.display = 'none';
             }
         }
     } catch (error) {
@@ -41,7 +52,6 @@ async function loadAdminProfile() {
     }
 }
 
-// ===== LOAD USERS =====
 async function loadUsers() {
     try {
         const response = await fetch(`${API_URL}/api/admin/users`, {
@@ -61,18 +71,19 @@ async function loadUsers() {
 
 function renderUsers(users) {
     const grid = document.getElementById('usersGrid');
+    if (!grid) return;
+    
     grid.innerHTML = '';
 
     if (users.length === 0) {
-        grid.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No users found</p>';
+        grid.innerHTML = '<p style="color: rgba(200,220,255,0.5); text-align: center; grid-column: 1/-1;">No users found</p>';
         return;
     }
 
     users.forEach(user => {
         const card = document.createElement('div');
         card.className = 'user-card';
-        card.onclick = () => showUserInfo(user);
-
+        
         const statusClass = user.status === 'paused' ? 'paused' : user.status === 'banned' ? 'banned' : '';
 
         card.innerHTML = `
@@ -90,8 +101,8 @@ function renderUsers(users) {
 }
 
 function searchUsers() {
-    const query = document.getElementById('userSearch').value.toLowerCase();
-    const cards = document.querySelectorAll('.user-card');
+    const query = document.getElementById('userSearch')?.value.toLowerCase() || '';
+    const cards = document.querySelectorAll('#usersGrid .user-card');
 
     cards.forEach(card => {
         const name = card.querySelector('h4').textContent.toLowerCase();
@@ -99,15 +110,14 @@ function searchUsers() {
     });
 }
 
-// ===== LICENSE GENERATOR =====
 function selectLicenseType(type, element) {
     selectedLicenseType = type;
     document.querySelectorAll('.license-type-btn').forEach(b => b.classList.remove('active'));
-    element.classList.add('active');
+    if (element) element.classList.add('active');
 }
 
 async function generateLicense() {
-    const credits = document.getElementById('licenseCredits').value;
+    const credits = document.getElementById('licenseCredits')?.value || 50;
 
     try {
         const response = await fetch(`${API_URL}/api/admin/generate-license`, {
@@ -136,11 +146,11 @@ async function generateLicense() {
 
 function copyLicense() {
     const key = document.getElementById('licenseKeyOutput').textContent;
-    navigator.clipboard.writeText(key);
-    showToast('License copied!', 'success');
+    navigator.clipboard.writeText(key).then(() => {
+        showToast('License copied!', 'success');
+    });
 }
 
-// ===== LOAD LICENSES =====
 async function loadLicenses() {
     try {
         const response = await fetch(`${API_URL}/api/admin/licenses`, {
@@ -152,15 +162,22 @@ async function loadLicenses() {
         const data = await response.json();
         if (data.success) {
             const tbody = document.getElementById('licenseList');
+            if (!tbody) return;
+            
             tbody.innerHTML = '';
+            
+            if (data.licenses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: rgba(200,220,255,0.5);">No licenses yet</td></tr>';
+                return;
+            }
 
             data.licenses.forEach(license => {
-                const statusColor = license.status === 'used' ? '#00d084' :
-                                   license.status === 'unused' ? '#ffb800' : '#ff4757';
+                const statusColor = license.status === 'used' ? '#00ff88' :
+                                   license.status === 'unused' ? '#ffb800' : '#ff3b5c';
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><code style="color: #6c63ff;">${license.key}</code></td>
+                    <td><code style="color: #00b4ff;">${license.key}</code></td>
                     <td>${license.type}</td>
                     <td style="color: ${statusColor};">${license.status}</td>
                     <td>${license.credits}</td>
@@ -170,11 +187,10 @@ async function loadLicenses() {
             });
         }
     } catch (error) {
-        console.error('Licenses load error:', error);
+        console.error('Licenses error:', error);
     }
 }
 
-// ===== USER CREDITS =====
 async function loadCreditUsers() {
     try {
         const response = await fetch(`${API_URL}/api/admin/users`, {
@@ -186,6 +202,8 @@ async function loadCreditUsers() {
         const data = await response.json();
         if (data.success) {
             const select = document.getElementById('creditUserSelect');
+            if (!select) return;
+            
             select.innerHTML = '<option value="">Select a user</option>';
 
             data.users.forEach(user => {
@@ -198,17 +216,18 @@ async function loadCreditUsers() {
 
             select.onchange = () => {
                 const selected = select.options[select.selectedIndex];
-                document.getElementById('currentCredits').value = selected.dataset.credits || 0;
+                const currentEl = document.getElementById('currentCredits');
+                if (currentEl) currentEl.value = selected.dataset.credits || 0;
             };
         }
     } catch (error) {
-        console.error('Credit users load error:', error);
+        console.error('Credit users error:', error);
     }
 }
 
 async function addCredits() {
-    const userId = document.getElementById('creditUserSelect').value;
-    const amount = document.getElementById('addCreditsAmount').value;
+    const userId = document.getElementById('creditUserSelect')?.value;
+    const amount = document.getElementById('addCreditsAmount')?.value;
 
     if (!userId || !amount) {
         showToast('Select user and enter amount!', 'error');
@@ -229,9 +248,8 @@ async function addCredits() {
         const data = await response.json();
         if (data.success) {
             showToast('Credits added!', 'success');
+            document.getElementById('addCreditsAmount').value = '';
             loadCreditUsers();
-        } else {
-            showToast(data.message || 'Failed!', 'error');
         }
     } catch (error) {
         showToast('Connection error!', 'error');
@@ -239,8 +257,8 @@ async function addCredits() {
 }
 
 async function setCredits() {
-    const userId = document.getElementById('creditUserSelect').value;
-    const amount = document.getElementById('setCreditsAmount').value;
+    const userId = document.getElementById('creditUserSelect')?.value;
+    const amount = document.getElementById('setCreditsAmount')?.value;
 
     if (!userId || amount === '') {
         showToast('Select user and enter amount!', 'error');
@@ -261,15 +279,10 @@ async function setCredits() {
         const data = await response.json();
         if (data.success) {
             showToast('Credits updated!', 'success');
+            document.getElementById('setCreditsAmount').value = '';
             loadCreditUsers();
-        } else {
-            showToast(data.message || 'Failed!', 'error');
         }
     } catch (error) {
         showToast('Connection error!', 'error');
     }
-}
-
-function showUserInfo(user) {
-    showToast(`${user.username} - Credits: ${user.credits}`, 'success');
 }
