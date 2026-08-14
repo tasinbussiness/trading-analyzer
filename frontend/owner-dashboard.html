@@ -12,7 +12,6 @@
 </head>
 <body class="dashboard-body">
 
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
@@ -65,16 +64,11 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content">
         <div class="topbar">
             <button class="menu-toggle" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="topbar-logo-mini">
-                <img src="https://i.imgur.com/MQXgZBV.png" alt="Logo">
-                <span>STRUGGLE AI</span>
-            </div>
             <div class="topbar-right">
                 <div class="owner-badge">
                     <i class="fas fa-crown"></i>
@@ -87,7 +81,7 @@
             </div>
         </div>
 
-        <!-- ===== ANALYZER PAGE ===== -->
+        <!-- Analyzer -->
         <div class="page active" id="page-analyzer">
             <div class="page-header">
                 <h1><i class="fas fa-robot"></i> AI Analyzer</h1>
@@ -101,7 +95,7 @@
                             <i class="fas fa-cloud-upload-alt"></i>
                         </div>
                         <h3>Drop Chart Screenshot Here</h3>
-                        <p>Click to browse • Drag & Drop • Paste (Ctrl+V)</p>
+                        <p>Auto-analyze on upload • Drag & Drop • Paste (Ctrl+V)</p>
                         <div class="upload-formats">
                             <span>PNG</span>
                             <span>JPG</span>
@@ -116,11 +110,6 @@
                     </div>
                     <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)" style="display:none;">
                 </div>
-
-                <button class="analyze-btn" id="analyzeBtn" onclick="startAnalysis()" disabled>
-                    <i class="fas fa-search-dollar"></i>
-                    <span>Analyze Chart</span>
-                </button>
             </div>
 
             <div class="processing-container" id="processingContainer" style="display:none;">
@@ -184,7 +173,7 @@
             </div>
         </div>
 
-        <!-- ===== ADMIN CONTROL PAGE ===== -->
+        <!-- Admin Control -->
         <div class="page" id="page-admincontrol">
             <div class="page-header">
                 <h1><i class="fas fa-user-shield"></i> Admin Control</h1>
@@ -204,7 +193,7 @@
             <div class="users-grid" id="adminsGrid"></div>
         </div>
 
-        <!-- ===== USER CONTROL PAGE ===== -->
+        <!-- User Control -->
         <div class="page" id="page-usercontrol">
             <div class="page-header">
                 <h1><i class="fas fa-users-cog"></i> User Control</h1>
@@ -221,7 +210,7 @@
             <div class="users-grid" id="usersGrid"></div>
         </div>
 
-        <!-- ===== ALL DATA PAGE ===== -->
+        <!-- All Data -->
         <div class="page" id="page-alldata">
             <div class="page-header">
                 <h1><i class="fas fa-database"></i> All Data</h1>
@@ -231,64 +220,40 @@
             <div class="stats-grid">
                 <div class="stat-card stat-total">
                     <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
-                    <div class="stat-info">
-                        <h3 id="totalAnalysis">0</h3>
-                        <p>Total Analysis</p>
-                    </div>
+                    <div class="stat-info"><h3 id="totalAnalysis">0</h3><p>Total Analysis</p></div>
                 </div>
                 <div class="stat-card stat-today">
                     <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
-                    <div class="stat-info">
-                        <h3 id="todayAnalysis">0</h3>
-                        <p>Today</p>
-                    </div>
+                    <div class="stat-info"><h3 id="todayAnalysis">0</h3><p>Today</p></div>
                 </div>
                 <div class="stat-card stat-week">
                     <div class="stat-icon"><i class="fas fa-calendar-week"></i></div>
-                    <div class="stat-info">
-                        <h3 id="weekAnalysis">0</h3>
-                        <p>This Week</p>
-                    </div>
+                    <div class="stat-info"><h3 id="weekAnalysis">0</h3><p>This Week</p></div>
                 </div>
                 <div class="stat-card stat-month">
                     <div class="stat-icon"><i class="fas fa-calendar-alt"></i></div>
-                    <div class="stat-info">
-                        <h3 id="monthAnalysis">0</h3>
-                        <p>This Month</p>
-                    </div>
+                    <div class="stat-info"><h3 id="monthAnalysis">0</h3><p>This Month</p></div>
                 </div>
                 <div class="stat-card stat-up">
                     <div class="stat-icon"><i class="fas fa-arrow-up"></i></div>
-                    <div class="stat-info">
-                        <h3 id="upCount">0</h3>
-                        <p>Buy Signals</p>
-                    </div>
+                    <div class="stat-info"><h3 id="upCount">0</h3><p>Buy Signals</p></div>
                 </div>
                 <div class="stat-card stat-down">
                     <div class="stat-icon"><i class="fas fa-arrow-down"></i></div>
-                    <div class="stat-info">
-                        <h3 id="downCount">0</h3>
-                        <p>Sell Signals</p>
-                    </div>
+                    <div class="stat-info"><h3 id="downCount">0</h3><p>Sell Signals</p></div>
                 </div>
                 <div class="stat-card stat-avoid">
                     <div class="stat-icon"><i class="fas fa-ban"></i></div>
-                    <div class="stat-info">
-                        <h3 id="avoidCount">0</h3>
-                        <p>Avoid Signals</p>
-                    </div>
+                    <div class="stat-info"><h3 id="avoidCount">0</h3><p>Avoid Signals</p></div>
                 </div>
                 <div class="stat-card stat-users">
                     <div class="stat-icon"><i class="fas fa-users"></i></div>
-                    <div class="stat-info">
-                        <h3 id="totalUsers">0</h3>
-                        <p>Total Users</p>
-                    </div>
+                    <div class="stat-info"><h3 id="totalUsers">0</h3><p>Total Users</p></div>
                 </div>
             </div>
         </div>
 
-        <!-- ===== LICENSE MANAGER PAGE ===== -->
+        <!-- License Manager -->
         <div class="page" id="page-license">
             <div class="page-header">
                 <h1><i class="fas fa-key"></i> License Manager</h1>
@@ -350,7 +315,7 @@
             </div>
         </div>
 
-        <!-- ===== NOTICE PAGE ===== -->
+        <!-- Notice -->
         <div class="page" id="page-notice">
             <div class="page-header">
                 <h1><i class="fas fa-bullhorn"></i> Notice Manager</h1>
@@ -388,11 +353,27 @@
             </div>
         </div>
 
-        <!-- ===== STRATEGY CONTROL PAGE ===== -->
+        <!-- Strategy Control with Force Trade -->
         <div class="page" id="page-strategy">
             <div class="page-header">
                 <h1><i class="fas fa-chess-knight"></i> Strategy Control</h1>
                 <p>Enable/Disable trading strategies</p>
+            </div>
+
+            <!-- Force Trade Mode -->
+            <div class="force-trade-card">
+                <div class="force-trade-info">
+                    <h4>⚡ Force Trade Mode</h4>
+                    <p>When ON: System will always give BUY or SELL signal, never AVOID.<br>Risky trades will still work with lower confidence.</p>
+                    <div class="force-trade-warning" id="forceTradeWarning" style="display:none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Warning: Force Trade is ON. Some signals may be risky!</span>
+                    </div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="forceTradeToggle" onchange="toggleForceTrade()">
+                    <span class="toggle-slider"></span>
+                </label>
             </div>
 
             <div class="strategy-control-grid">
@@ -574,7 +555,7 @@
             </button>
         </div>
 
-        <!-- ===== PROFILE PAGE ===== -->
+        <!-- Profile -->
         <div class="page" id="page-profile">
             <div class="page-header">
                 <h1><i class="fas fa-user-circle"></i> Profile</h1>
