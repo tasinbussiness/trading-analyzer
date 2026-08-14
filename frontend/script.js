@@ -1,5 +1,8 @@
-// ===== CONFIGURATION =====
-const API_URL = 'https://trading-analyzer-hm0g.onrender.com'; // Replace after deploy
+// ===== STRUGGLE AI - MAIN SCRIPT =====
+// Fixed all functions + Auto backend URL detection
+
+// ===== AUTO API URL DETECTION =====
+const API_URL = window.location.origin;
 
 // ===== LOGIN MODE =====
 let currentMode = 'user';
@@ -9,16 +12,17 @@ function setMode(mode) {
     document.querySelectorAll('.mode-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+    const activeBtn = document.querySelector(`[data-mode="${mode}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
 
     const titles = {
-        user: { title: 'User Login', subtitle: 'Welcome back! Please login to continue' },
-        admin: { title: 'Admin Login', subtitle: 'Admin access only' },
-        owner: { title: 'Owner Login', subtitle: 'Full system control access' }
+        user: 'Secure Login',
+        admin: 'Admin Login',
+        owner: 'Owner Login'
     };
 
-    document.getElementById('loginTitle').textContent = titles[mode].title;
-    document.getElementById('loginSubtitle').textContent = titles[mode].subtitle;
+    const titleEl = document.getElementById('loginTitle');
+    if (titleEl) titleEl.textContent = titles[mode];
 }
 
 // ===== HANDLE LOGIN =====
@@ -35,9 +39,10 @@ async function handleLogin(event) {
     }
 
     // Show loader
-    loginBtn.querySelector('.btn-text').style.display = 'none';
-    loginBtn.querySelector('.btn-loader').style.display = 'block';
-    loginBtn.querySelector('.btn-arrow').style.display = 'none';
+    const btnText = loginBtn.querySelector('.btn-text');
+    const btnLoader = loginBtn.querySelector('.btn-loader');
+    if (btnText) btnText.style.display = 'none';
+    if (btnLoader) btnLoader.style.display = 'block';
     loginBtn.disabled = true;
 
     try {
@@ -63,16 +68,16 @@ async function handleLogin(event) {
                 if (currentMode === 'user') window.location.href = 'user-dashboard.html';
                 else if (currentMode === 'admin') window.location.href = 'admin-dashboard.html';
                 else if (currentMode === 'owner') window.location.href = 'owner-dashboard.html';
-            }, 1500);
+            }, 1000);
         } else {
             showToast(data.message || 'Invalid credentials!', 'error');
         }
     } catch (error) {
+        console.error('Login error:', error);
         showToast('Connection error! Please try again.', 'error');
     } finally {
-        loginBtn.querySelector('.btn-text').style.display = 'block';
-        loginBtn.querySelector('.btn-loader').style.display = 'none';
-        loginBtn.querySelector('.btn-arrow').style.display = 'block';
+        if (btnText) btnText.style.display = 'flex';
+        if (btnLoader) btnLoader.style.display = 'none';
         loginBtn.disabled = false;
     }
 }
@@ -96,8 +101,15 @@ async function handleRegister(event) {
         return;
     }
 
-    registerBtn.querySelector('.btn-text').style.display = 'none';
-    registerBtn.querySelector('.btn-loader').style.display = 'block';
+    if (username.length < 3) {
+        showToast('Username must be at least 3 characters!', 'error');
+        return;
+    }
+
+    const btnText = registerBtn.querySelector('.btn-text');
+    const btnLoader = registerBtn.querySelector('.btn-loader');
+    if (btnText) btnText.style.display = 'none';
+    if (btnLoader) btnLoader.style.display = 'block';
     registerBtn.disabled = true;
 
     try {
@@ -117,15 +129,16 @@ async function handleRegister(event) {
             showToast('Account created successfully!', 'success');
             setTimeout(() => {
                 window.location.href = 'index.html';
-            }, 2000);
+            }, 1500);
         } else {
             showToast(data.message || 'Registration failed!', 'error');
         }
     } catch (error) {
+        console.error('Register error:', error);
         showToast('Connection error! Please try again.', 'error');
     } finally {
-        registerBtn.querySelector('.btn-text').style.display = 'block';
-        registerBtn.querySelector('.btn-loader').style.display = 'none';
+        if (btnText) btnText.style.display = 'flex';
+        if (btnLoader) btnLoader.style.display = 'none';
         registerBtn.disabled = false;
     }
 }
@@ -179,6 +192,11 @@ async function resetPassword() {
         return;
     }
 
+    if (newPass.length < 6) {
+        showToast('Password must be at least 6 characters!', 'error');
+        return;
+    }
+
     try {
         const response = await fetch(`${API_URL}/api/reset-password`, {
             method: 'POST',
@@ -198,6 +216,7 @@ async function resetPassword() {
             showToast(data.message || 'Reset failed!', 'error');
         }
     } catch (error) {
+        console.error('Reset error:', error);
         showToast('Connection error!', 'error');
     }
 }
@@ -208,6 +227,8 @@ function showToast(message, type = 'success') {
     const toastMessage = document.getElementById('toastMessage');
     const toastIcon = document.getElementById('toastIcon');
 
+    if (!toast) return;
+
     const icons = {
         success: '✅',
         error: '❌',
@@ -215,8 +236,8 @@ function showToast(message, type = 'success') {
     };
 
     toast.className = `toast ${type}`;
-    toastIcon.textContent = icons[type];
-    toastMessage.textContent = message;
+    if (toastIcon) toastIcon.textContent = icons[type];
+    if (toastMessage) toastMessage.textContent = message;
     toast.classList.add('show');
 
     setTimeout(() => {
@@ -224,47 +245,14 @@ function showToast(message, type = 'success') {
     }, 3500);
 }
 
-// ===== PARTICLES =====
-function createParticles() {
-    const container = document.getElementById('particles');
-    if (!container) return;
-
-    for (let i = 0; i < 50; i++) {
-        const particle = document.createElement('div');
-        particle.style.cssText = `
-            position: absolute;
-            width: ${Math.random() * 3 + 1}px;
-            height: ${Math.random() * 3 + 1}px;
-            background: rgba(108, 99, 255, ${Math.random() * 0.5 + 0.2});
-            border-radius: 50%;
-            left: ${Math.random() * 100}%;
-            top: ${Math.random() * 100}%;
-            animation: particleFloat ${Math.random() * 10 + 5}s ease-in-out infinite;
-            animation-delay: ${Math.random() * 5}s;
-        `;
-        container.appendChild(particle);
-    }
-}
-
-// Add particle animation to CSS
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes particleFloat {
-        0%, 100% { transform: translateY(0) translateX(0); opacity: 0.5; }
-        25% { transform: translateY(-20px) translateX(10px); opacity: 1; }
-        75% { transform: translateY(20px) translateX(-10px); opacity: 0.3; }
-    }
-`;
-document.head.appendChild(style);
-
-// ===== INIT =====
+// ===== AUTO REDIRECT IF LOGGED IN =====
 document.addEventListener('DOMContentLoaded', () => {
-    createParticles();
-
-    // Check if already logged in
     const token = localStorage.getItem('token');
     const mode = localStorage.getItem('userMode');
-    if (token && mode && window.location.pathname.includes('index.html')) {
+    const path = window.location.pathname;
+
+    // Only redirect on index.html or register.html
+    if (token && mode && (path.includes('index.html') || path.endsWith('/') || path.includes('register.html'))) {
         if (mode === 'user') window.location.href = 'user-dashboard.html';
         else if (mode === 'admin') window.location.href = 'admin-dashboard.html';
         else if (mode === 'owner') window.location.href = 'owner-dashboard.html';
