@@ -1,6 +1,5 @@
-# ===== DATABASE SYSTEM =====
-# JSON-based database (works without external DB)
-# Can be replaced with Supabase later
+# ===== STRUGGLE AI - DATABASE SYSTEM =====
+# JSON-based Database with Force Trade support
 # database_setup.py
 
 import json
@@ -11,23 +10,19 @@ from threading import Lock
 
 class Database:
     """
-    Simple JSON-based Database
-    - Users management
-    - License storage
-    - Analysis records
-    - Notices
-    - Strategy settings
-    - Thread-safe operations
+    JSON-based Database
+    - Users, Licenses, Notices
+    - Strategies with Force Trade
+    - Analytics tracking
+    - Thread-safe
     """
 
     def __init__(self, data_dir='data'):
         self.data_dir = data_dir
         self.lock = Lock()
 
-        # Create data directory
         os.makedirs(data_dir, exist_ok=True)
 
-        # Database files
         self.files = {
             'users': os.path.join(data_dir, 'users.json'),
             'licenses': os.path.join(data_dir, 'licenses.json'),
@@ -38,11 +33,10 @@ class Database:
             'analytics': os.path.join(data_dir, 'analytics.json')
         }
 
-        # Initialize files
         self._init_files()
 
     def _init_files(self):
-        """Initialize database files if they don't exist"""
+        """Initialize database files with defaults"""
         defaults = {
             'users': [],
             'licenses': [],
@@ -63,7 +57,8 @@ class Database:
                 'range_scalping': True,
                 'volatility_filter': True,
                 'smart_doji': True,
-                'exhaustion': True
+                'exhaustion': True,
+                'force_trade': False  # Default OFF
             },
             'owner': {
                 'nickname': 'Owner',
@@ -83,13 +78,19 @@ class Database:
         for key, filepath in self.files.items():
             if not os.path.exists(filepath):
                 self._write(filepath, defaults.get(key, {}))
+            else:
+                # Ensure force_trade exists in strategies
+                if key == 'strategies':
+                    data = self._read(filepath) or {}
+                    if 'force_trade' not in data:
+                        data['force_trade'] = False
+                        self._write(filepath, data)
 
     # ============================================
     # ===== FILE OPERATIONS =====
     # ============================================
 
     def _read(self, filepath):
-        """Read JSON file"""
         with self.lock:
             try:
                 with open(filepath, 'r', encoding='utf-8') as f:
@@ -98,7 +99,6 @@ class Database:
                 return None
 
     def _write(self, filepath, data):
-        """Write JSON file"""
         with self.lock:
             try:
                 with open(filepath, 'w', encoding='utf-8') as f:
@@ -113,13 +113,11 @@ class Database:
     # ============================================
 
     def create_user(self, user_data):
-        """Create a new user"""
         users = self._read(self.files['users']) or []
         users.append(user_data)
         self._write(self.files['users'], users)
 
     def get_user(self, user_id):
-        """Get user by ID"""
         users = self._read(self.files['users']) or []
         for user in users:
             if user.get('id') == user_id:
@@ -127,7 +125,6 @@ class Database:
         return None
 
     def get_user_by_username(self, username):
-        """Get user by username"""
         users = self._read(self.files['users']) or []
         for user in users:
             if user.get('username', '').lower() == username.lower():
@@ -135,7 +132,6 @@ class Database:
         return None
 
     def get_user_by_license(self, license_key):
-        """Get user by license key"""
         users = self._read(self.files['users']) or []
         for user in users:
             if user.get('license_key') == license_key:
@@ -143,7 +139,6 @@ class Database:
         return None
 
     def username_exists(self, username):
-        """Check if username already exists"""
         users = self._read(self.files['users']) or []
         for user in users:
             if user.get('username', '').lower() == username.lower():
@@ -151,7 +146,6 @@ class Database:
         return False
 
     def update_user(self, user_id, updates):
-        """Update user data"""
         users = self._read(self.files['users']) or []
         for i, user in enumerate(users):
             if user.get('id') == user_id:
@@ -161,13 +155,11 @@ class Database:
         return False
 
     def delete_user(self, user_id):
-        """Delete a user"""
         users = self._read(self.files['users']) or []
         users = [u for u in users if u.get('id') != user_id]
         self._write(self.files['users'], users)
 
     def get_all_users(self, role=None):
-        """Get all users, optionally filtered by role"""
         users = self._read(self.files['users']) or []
         if role:
             return [u for u in users if u.get('role') == role]
@@ -178,13 +170,11 @@ class Database:
     # ============================================
 
     def save_license(self, license_data):
-        """Save a new license"""
         licenses = self._read(self.files['licenses']) or []
         licenses.append(license_data)
         self._write(self.files['licenses'], licenses)
 
     def get_license(self, license_key):
-        """Get license by key"""
         licenses = self._read(self.files['licenses']) or []
         for lic in licenses:
             if lic.get('key') == license_key:
@@ -192,7 +182,6 @@ class Database:
         return None
 
     def license_exists(self, license_key):
-        """Check if license key exists"""
         licenses = self._read(self.files['licenses']) or []
         for lic in licenses:
             if lic.get('key') == license_key:
@@ -200,7 +189,6 @@ class Database:
         return False
 
     def update_license(self, license_key, updates):
-        """Update license data"""
         licenses = self._read(self.files['licenses']) or []
         for i, lic in enumerate(licenses):
             if lic.get('key') == license_key:
@@ -210,13 +198,11 @@ class Database:
         return False
 
     def delete_license(self, license_key):
-        """Delete a license"""
         licenses = self._read(self.files['licenses']) or []
         licenses = [l for l in licenses if l.get('key') != license_key]
         self._write(self.files['licenses'], licenses)
 
     def get_all_licenses(self):
-        """Get all licenses"""
         return self._read(self.files['licenses']) or []
 
     # ============================================
@@ -224,8 +210,6 @@ class Database:
     # ============================================
 
     def add_analysis(self, user_id, analysis_data):
-        """Add analysis record for a user"""
-        # Update user history
         users = self._read(self.files['users']) or []
         for i, user in enumerate(users):
             if user.get('id') == user_id:
@@ -233,21 +217,15 @@ class Database:
                     users[i]['analysis_history'] = []
 
                 users[i]['analysis_history'].insert(0, analysis_data)
-
-                # Keep last 100 records
                 users[i]['analysis_history'] = users[i]['analysis_history'][:100]
-
-                # Update count
                 users[i]['analysis_count'] = users[i].get('analysis_count', 0) + 1
 
                 self._write(self.files['users'], users)
                 break
 
-        # Update global analytics
         self._update_analytics(analysis_data)
 
     def _update_analytics(self, analysis_data):
-        """Update global analytics"""
         analytics = self._read(self.files['analytics']) or {
             'total_analysis': 0,
             'total_buy': 0,
@@ -267,7 +245,6 @@ class Database:
         else:
             analytics['total_avoid'] += 1
 
-        # Daily tracking
         today = datetime.datetime.utcnow().strftime('%Y-%m-%d')
         if today not in analytics['daily']:
             analytics['daily'][today] = {'total': 0, 'buy': 0, 'sell': 0, 'avoid': 0}
@@ -280,7 +257,6 @@ class Database:
         else:
             analytics['daily'][today]['avoid'] += 1
 
-        # Monthly tracking
         month = datetime.datetime.utcnow().strftime('%Y-%m')
         if month not in analytics['monthly']:
             analytics['monthly'][month] = {'total': 0, 'buy': 0, 'sell': 0, 'avoid': 0}
@@ -300,13 +276,11 @@ class Database:
     # ============================================
 
     def save_last_signal(self, user_id, signal_data):
-        """Save last signal for same-chart detection"""
         signals = self._read(self.files['signals']) or {}
         signals[user_id] = signal_data
         self._write(self.files['signals'], signals)
 
     def get_last_signal(self, user_id):
-        """Get last signal for a user"""
         signals = self._read(self.files['signals']) or {}
         return signals.get(user_id)
 
@@ -315,7 +289,6 @@ class Database:
     # ============================================
 
     def get_user_stats(self, user_id):
-        """Get stats for a specific user"""
         user = self.get_user(user_id)
         if not user:
             return {
@@ -341,18 +314,16 @@ class Database:
             'avoid': avoid_count,
             'up': up_count,
             'down': down_count,
-            'history': history[:20]  # Last 20
+            'history': history[:20]
         }
 
     def get_global_stats(self):
-        """Get global stats for owner"""
         analytics = self._read(self.files['analytics']) or {}
         users = self._read(self.files['users']) or []
 
         today = datetime.datetime.utcnow().strftime('%Y-%m-%d')
         month = datetime.datetime.utcnow().strftime('%Y-%m')
 
-        # Calculate week
         today_date = datetime.datetime.utcnow()
         week_start = (today_date - datetime.timedelta(days=today_date.weekday())).strftime('%Y-%m-%d')
 
@@ -362,7 +333,6 @@ class Database:
         today_stats = daily.get(today, {'total': 0})
         month_stats = monthly.get(month, {'total': 0})
 
-        # Week calculation
         week_total = 0
         for date_str, data in daily.items():
             if date_str >= week_start:
@@ -384,22 +354,17 @@ class Database:
     # ============================================
 
     def save_notice(self, notice_data):
-        """Save a new notice"""
         notices = self._read(self.files['notices']) or []
 
-        # Deactivate old notices
         for i in range(len(notices)):
             notices[i]['active'] = False
 
         notices.insert(0, notice_data)
-
-        # Keep last 50 notices
         notices = notices[:50]
 
         self._write(self.files['notices'], notices)
 
     def get_active_notice(self):
-        """Get the current active notice"""
         notices = self._read(self.files['notices']) or []
         for notice in notices:
             if notice.get('active', False):
@@ -407,32 +372,37 @@ class Database:
         return None
 
     def get_all_notices(self):
-        """Get all notices"""
         notices = self._read(self.files['notices']) or []
-        return notices[:20]  # Last 20
+        return notices[:20]
 
     # ============================================
     # ===== STRATEGY OPERATIONS =====
     # ============================================
 
     def get_strategies(self):
-        """Get current strategy settings"""
-        return self._read(self.files['strategies']) or {}
+        strategies = self._read(self.files['strategies']) or {}
+        # Ensure force_trade key exists
+        if 'force_trade' not in strategies:
+            strategies['force_trade'] = False
+            self._write(self.files['strategies'], strategies)
+        return strategies
 
     def save_strategies(self, strategies):
-        """Save strategy settings"""
-        self._write(self.files['strategies'], strategies)
+        # Ensure force_trade is included
+        current = self._read(self.files['strategies']) or {}
+        current.update(strategies)
+        if 'force_trade' not in current:
+            current['force_trade'] = False
+        self._write(self.files['strategies'], current)
 
     # ============================================
     # ===== OWNER DATA =====
     # ============================================
 
     def get_owner_data(self):
-        """Get owner profile data"""
         return self._read(self.files['owner']) or {'nickname': 'Owner', 'avatar': ''}
 
     def update_owner_data(self, updates):
-        """Update owner data"""
         data = self._read(self.files['owner']) or {}
         data.update(updates)
         self._write(self.files['owner'], data)
@@ -443,7 +413,7 @@ class Database:
 # ============================================
 
 def init_db():
-    """Initialize and return database instance"""
+    """Initialize database"""
     db = Database()
-    print("✅ Database initialized successfully!")
+    print("✅ Struggle AI Database initialized!")
     return db
