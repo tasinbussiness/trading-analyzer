@@ -56,10 +56,6 @@
             <button class="menu-toggle" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="topbar-logo-mini">
-                <img src="https://i.imgur.com/MQXgZBV.png" alt="Logo">
-                <span>STRUGGLE AI</span>
-            </div>
             <div class="topbar-right">
                 <div class="credit-display" id="creditDisplay">
                     <i class="fas fa-coins"></i>
@@ -83,10 +79,9 @@
         <div class="page active" id="page-analyzer">
             <div class="page-header">
                 <h1><i class="fas fa-robot"></i> AI Analyzer</h1>
-                <p>Upload chart screenshot for professional analysis</p>
+                <p>Upload chart screenshot for automatic analysis</p>
             </div>
 
-            <!-- Credit Bar -->
             <div class="credit-bar-container">
                 <div class="credit-bar-header">
                     <span>Credits Remaining</span>
@@ -97,7 +92,6 @@
                 </div>
             </div>
 
-            <!-- Upload Box -->
             <div class="upload-container" id="uploadContainer">
                 <div class="upload-box" id="uploadBox" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
                     <div class="upload-content" id="uploadContent">
@@ -105,7 +99,7 @@
                             <i class="fas fa-cloud-upload-alt"></i>
                         </div>
                         <h3>Drop Chart Screenshot Here</h3>
-                        <p>Click to browse • Drag & Drop • Paste (Ctrl+V)</p>
+                        <p>Auto-analyze on upload • Drag & Drop • Paste (Ctrl+V)</p>
                         <div class="upload-formats">
                             <span>PNG</span>
                             <span>JPG</span>
@@ -120,14 +114,8 @@
                     </div>
                     <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)" style="display:none;">
                 </div>
-
-                <button class="analyze-btn" id="analyzeBtn" onclick="startAnalysis()" disabled>
-                    <i class="fas fa-search-dollar"></i>
-                    <span>Analyze Chart</span>
-                </button>
             </div>
 
-            <!-- Processing -->
             <div class="processing-container" id="processingContainer" style="display:none;">
                 <div class="processing-animation">
                     <div class="processing-circle">
@@ -140,26 +128,13 @@
                 </div>
                 <h3 class="processing-text" id="processingText">Analyzing Chart...</h3>
                 <div class="processing-steps">
-                    <div class="step" id="step1">
-                        <i class="fas fa-circle"></i>
-                        <span>Reading Chart</span>
-                    </div>
-                    <div class="step" id="step2">
-                        <i class="fas fa-circle"></i>
-                        <span>Detecting Patterns</span>
-                    </div>
-                    <div class="step" id="step3">
-                        <i class="fas fa-circle"></i>
-                        <span>Applying Strategies</span>
-                    </div>
-                    <div class="step" id="step4">
-                        <i class="fas fa-circle"></i>
-                        <span>Generating Signal</span>
-                    </div>
+                    <div class="step" id="step1"><i class="fas fa-circle"></i><span>Reading Chart</span></div>
+                    <div class="step" id="step2"><i class="fas fa-circle"></i><span>Detecting Patterns</span></div>
+                    <div class="step" id="step3"><i class="fas fa-circle"></i><span>Applying Strategies</span></div>
+                    <div class="step" id="step4"><i class="fas fa-circle"></i><span>Generating Signal</span></div>
                 </div>
             </div>
 
-            <!-- Result Box -->
             <div class="result-container" id="resultContainer" style="display:none;">
                 <div class="result-header" id="resultHeader">
                     <div class="result-signal" id="resultSignal">
@@ -204,7 +179,6 @@
                 </button>
             </div>
 
-            <!-- Warning Box -->
             <div class="warning-container" id="warningContainer" style="display:none;">
                 <div class="warning-icon">⚠️</div>
                 <h3 id="warningTitle">Warning</h3>
@@ -364,10 +338,7 @@
             </div>
             <div class="modal-body">
                 <div class="support-logo">
-                    <div class="sidebar-logo" style="width:60px;height:60px;margin:0 auto 10px;">
-                        <img src="https://i.imgur.com/MQXgZBV.png" alt="Struggle AI">
-                    </div>
-                    <h4>Struggle AI Support</h4>
+                    <h4 style="color:white;font-size:18px;text-align:center;margin-bottom:20px;">💬 Struggle AI Support</h4>
                 </div>
                 <div class="support-options">
                     <a href="#" class="support-option" id="ownerSupport" target="_blank">
