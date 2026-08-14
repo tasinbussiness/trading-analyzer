@@ -1,4 +1,4 @@
-// ===== OWNER DASHBOARD =====
+// ===== OWNER DASHBOARD - FULL =====
 
 let selectedLicenseType = 'user';
 let selectedUserId = null;
@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadStrategySettings();
 });
 
+// ===== LOAD OWNER PROFILE =====
 async function loadOwnerProfile() {
     try {
         const response = await fetch(`${API_URL}/api/profile`, {
@@ -57,6 +58,7 @@ async function loadOwnerProfile() {
     }
 }
 
+// ===== LOAD ADMINS =====
 async function loadAdmins() {
     try {
         const response = await fetch(`${API_URL}/api/owner/admins`, {
@@ -110,6 +112,7 @@ function searchAdmins(query) {
     });
 }
 
+// ===== ADD ADMIN =====
 async function showAddAdmin() {
     try {
         const response = await fetch(`${API_URL}/api/owner/generate-admin-license`, {
@@ -139,6 +142,7 @@ function copyAdminLicense() {
     });
 }
 
+// ===== LOAD ALL USERS =====
 async function loadAllUsers() {
     try {
         const response = await fetch(`${API_URL}/api/owner/all-users`, {
@@ -194,6 +198,7 @@ function searchUsers(query) {
     });
 }
 
+// ===== USER ACTION MODAL =====
 function showUserActionModal(user, type) {
     selectedUserId = user.id;
     selectedUserType = type;
@@ -276,6 +281,7 @@ async function userAction(action) {
     }
 }
 
+// ===== LOAD STATS =====
 async function loadAllStats() {
     try {
         const response = await fetch(`${API_URL}/api/owner/stats`, {
@@ -307,6 +313,7 @@ async function loadAllStats() {
     }
 }
 
+// ===== LICENSE MANAGER =====
 function selectLicenseType(type, element) {
     selectedLicenseType = type;
     document.querySelectorAll('.license-type-btn').forEach(b => b.classList.remove('active'));
@@ -413,6 +420,7 @@ async function deleteLicense(key) {
     }
 }
 
+// ===== NOTICE =====
 async function sendNotice() {
     const title = document.getElementById('noticeTitle')?.value.trim();
     const message = document.getElementById('noticeMessage')?.value.trim();
@@ -483,6 +491,7 @@ async function loadNoticeHistory() {
     }
 }
 
+// ===== STRATEGY CONTROL =====
 async function loadStrategySettings() {
     try {
         const response = await fetch(`${API_URL}/api/owner/strategies`, {
@@ -494,8 +503,19 @@ async function loadStrategySettings() {
         const data = await response.json();
         if (data.success && data.strategies) {
             Object.keys(data.strategies).forEach(key => {
-                const toggle = document.querySelector(`[data-strategy="${key}"]`);
-                if (toggle) toggle.checked = data.strategies[key];
+                if (key === 'force_trade') {
+                    const forceToggle = document.getElementById('forceTradeToggle');
+                    const warning = document.getElementById('forceTradeWarning');
+                    if (forceToggle) {
+                        forceToggle.checked = data.strategies[key];
+                        if (warning) {
+                            warning.style.display = data.strategies[key] ? 'flex' : 'none';
+                        }
+                    }
+                } else {
+                    const toggle = document.querySelector(`[data-strategy="${key}"]`);
+                    if (toggle) toggle.checked = data.strategies[key];
+                }
             });
         }
     } catch (error) {
@@ -508,6 +528,12 @@ async function saveStrategies() {
     document.querySelectorAll('[data-strategy]').forEach(toggle => {
         strategies[toggle.dataset.strategy] = toggle.checked;
     });
+    
+    // Include force_trade
+    const forceToggle = document.getElementById('forceTradeToggle');
+    if (forceToggle) {
+        strategies['force_trade'] = forceToggle.checked;
+    }
 
     try {
         const response = await fetch(`${API_URL}/api/owner/save-strategies`, {
@@ -528,6 +554,24 @@ async function saveStrategies() {
     }
 }
 
+// ===== FORCE TRADE TOGGLE =====
+function toggleForceTrade() {
+    const toggle = document.getElementById('forceTradeToggle');
+    const warning = document.getElementById('forceTradeWarning');
+    
+    if (toggle.checked) {
+        if (warning) warning.style.display = 'flex';
+        showToast('⚡ Force Trade Mode ON - No AVOID signals', 'warning');
+    } else {
+        if (warning) warning.style.display = 'none';
+        showToast('✅ Normal Mode - Safe trading', 'success');
+    }
+    
+    // Auto save
+    saveStrategies();
+}
+
+// ===== CHANGE OWNER PASSWORD =====
 async function changeOwnerPassword() {
     const currentPass = document.getElementById('currentPass')?.value;
     const newPass = document.getElementById('changeNewPass')?.value;
