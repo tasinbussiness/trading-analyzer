@@ -1,5 +1,5 @@
 // ===== DASHBOARD COMMON FUNCTIONS =====
-// Fixed all functions + Fast Analysis (18-20 sec)
+// Auto Analyze + Fast 18 sec + Beautiful Animations
 
 // ===== SIDEBAR TOGGLE =====
 function toggleSidebar() {
@@ -18,7 +18,6 @@ function showPage(pageId, element) {
     if (page) page.classList.add('active');
     if (element) element.classList.add('active');
 
-    // Close sidebar on mobile
     if (window.innerWidth <= 768) {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
@@ -52,8 +51,9 @@ function checkAuth(requiredMode) {
 // ===== FILE UPLOAD VARIABLES =====
 let selectedFile = null;
 let lastAnalyzedHash = null;
+let isAnalyzing = false;
 
-// ===== INIT UPLOAD SYSTEM =====
+// ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
     initUploadSystem();
 });
@@ -63,7 +63,6 @@ function initUploadSystem() {
     const fileInput = document.getElementById('fileInput');
 
     if (uploadBox && fileInput) {
-        // Click to upload
         uploadBox.addEventListener('click', (e) => {
             if (e.target.closest('.remove-img')) return;
             if (e.target.closest('.upload-preview')) return;
@@ -73,7 +72,9 @@ function initUploadSystem() {
 
     // Paste support
     document.addEventListener('paste', (e) => {
-        if (!document.getElementById('page-analyzer')?.classList.contains('active')) return;
+        const analyzerPage = document.getElementById('page-analyzer');
+        if (!analyzerPage?.classList.contains('active')) return;
+        if (isAnalyzing) return;
         
         const items = e.clipboardData?.items;
         if (!items) return;
@@ -116,6 +117,7 @@ function handleDragLeave(event) {
     if (uploadBox) uploadBox.classList.remove('drag-over');
 }
 
+// ===== PROCESS FILE + AUTO ANALYZE =====
 function processFile(file) {
     if (!file.type.startsWith('image/')) {
         showToast('Please upload an image file!', 'error');
@@ -127,6 +129,11 @@ function processFile(file) {
         return;
     }
 
+    if (isAnalyzing) {
+        showToast('Analysis already in progress!', 'warning');
+        return;
+    }
+
     selectedFile = file;
 
     const reader = new FileReader();
@@ -134,12 +141,16 @@ function processFile(file) {
         const uploadContent = document.getElementById('uploadContent');
         const uploadPreview = document.getElementById('uploadPreview');
         const previewImg = document.getElementById('previewImg');
-        const analyzeBtn = document.getElementById('analyzeBtn');
 
         if (uploadContent) uploadContent.style.display = 'none';
         if (uploadPreview) uploadPreview.style.display = 'block';
         if (previewImg) previewImg.src = e.target.result;
-        if (analyzeBtn) analyzeBtn.disabled = false;
+
+        // ===== AUTO ANALYZE =====
+        showToast('Chart uploaded! Analyzing...', 'success');
+        setTimeout(() => {
+            startAnalysis();
+        }, 800);
     };
     reader.readAsDataURL(file);
 }
@@ -154,37 +165,37 @@ function removeImage(event) {
     const uploadContent = document.getElementById('uploadContent');
     const uploadPreview = document.getElementById('uploadPreview');
     const previewImg = document.getElementById('previewImg');
-    const analyzeBtn = document.getElementById('analyzeBtn');
     const fileInput = document.getElementById('fileInput');
 
     if (uploadContent) uploadContent.style.display = 'block';
     if (uploadPreview) uploadPreview.style.display = 'none';
     if (previewImg) previewImg.src = '';
-    if (analyzeBtn) analyzeBtn.disabled = true;
     if (fileInput) fileInput.value = '';
 }
 
-// ===== ANALYSIS - FAST 18 SEC =====
+// ===== START ANALYSIS =====
 async function startAnalysis() {
     if (!selectedFile) {
-        showToast('Please upload a chart screenshot!', 'error');
+        showToast('Please upload a chart!', 'error');
         return;
     }
 
-    // Hide upload, show processing
+    if (isAnalyzing) return;
+    isAnalyzing = true;
+
     document.getElementById('uploadContainer').style.display = 'none';
     document.getElementById('resultContainer').style.display = 'none';
     document.getElementById('warningContainer').style.display = 'none';
     document.getElementById('processingContainer').style.display = 'block';
 
-    // Start processing animation (18 sec) AND backend call in parallel
+    // Parallel: Animation + Backend
     const animationPromise = animateProcessing();
     const analysisPromise = performAnalysis();
 
-    // Wait for both
     const [_, data] = await Promise.all([animationPromise, analysisPromise]);
 
     document.getElementById('processingContainer').style.display = 'none';
+    isAnalyzing = false;
 
     if (!data) {
         showToast('Analysis failed! Please try again.', 'error');
@@ -198,7 +209,6 @@ async function startAnalysis() {
         lastAnalyzedHash = data.chart_hash;
         showResult(data);
         
-        // Reload stats/profile after analysis
         if (typeof loadUserProfile === 'function') loadUserProfile();
         if (typeof loadUserStats === 'function') loadUserStats();
     } else {
@@ -229,7 +239,7 @@ async function performAnalysis() {
     }
 }
 
-// ===== PROCESSING ANIMATION (18 SEC) =====
+// ===== ANIMATION (18 SEC) =====
 function animateProcessing() {
     return new Promise((resolve) => {
         const progressCircle = document.getElementById('progressCircle');
@@ -244,7 +254,6 @@ function animateProcessing() {
             progressCircle.style.strokeDasharray = circumference;
         }
 
-        // Reset all steps
         ['step1', 'step2', 'step3', 'step4'].forEach((s) => {
             const step = document.getElementById(s);
             if (step) {
@@ -254,26 +263,23 @@ function animateProcessing() {
             }
         });
 
-        // Activate step 1
         const step1 = document.getElementById('step1');
         if (step1) step1.className = 'step active';
         if (processingText) processingText.textContent = texts[0];
 
-        const totalTime = 18000; // 18 seconds
+        const totalTime = 18000;
         const intervalTime = 100;
         const totalSteps = totalTime / intervalTime;
         const increment = 100 / totalSteps;
 
         const interval = setInterval(() => {
             progress += increment;
-            
             if (progress > 100) progress = 100;
             
             const offset = circumference - (progress / 100) * circumference;
             if (progressCircle) progressCircle.style.strokeDashoffset = offset;
             if (processPercent) processPercent.textContent = `${Math.round(progress)}%`;
 
-            // Step transitions
             if (progress >= 25 && progress < 50) {
                 markStepDone('step1');
                 activateStep('step2');
@@ -312,7 +318,7 @@ function markStepDone(stepId) {
     }
 }
 
-// ===== SHOW RESULT =====
+// ===== SHOW RESULT WITH ANIMATIONS =====
 function showResult(data) {
     const resultContainer = document.getElementById('resultContainer');
     const resultHeader = document.getElementById('resultHeader');
@@ -332,23 +338,34 @@ function showResult(data) {
         signalText = '🟡 AVOID TRADE';
     }
 
-    if (resultHeader) resultHeader.className = `result-header ${signalClass}`;
-    
+    if (resultHeader) {
+        resultHeader.className = `result-header ${signalClass}`;
+        resultHeader.classList.add('signal-animate');
+        setTimeout(() => resultHeader.classList.remove('signal-animate'), 2000);
+    }
+
     const signalIconEl = document.getElementById('signalIcon');
     const signalTextEl = document.getElementById('signalText');
-    if (signalIconEl) signalIconEl.textContent = signalIcon;
-    if (signalTextEl) signalTextEl.textContent = signalText;
+    if (signalIconEl) {
+        signalIconEl.textContent = signalIcon;
+        signalIconEl.classList.add('icon-bounce');
+        setTimeout(() => signalIconEl.classList.remove('icon-bounce'), 1500);
+    }
+    if (signalTextEl) {
+        signalTextEl.textContent = signalText;
+        signalTextEl.classList.add('text-glow');
+        setTimeout(() => signalTextEl.classList.remove('text-glow'), 3000);
+    }
 
-    // Confidence
     const confidenceEl = document.getElementById('resultConfidence');
     const confBar = document.getElementById('confidenceBar');
     if (confidenceEl) confidenceEl.textContent = `${data.confidence}%`;
     if (confBar) {
         confBar.style.width = `${data.confidence}%`;
         confBar.style.background = data.confidence >= 80 ? '#00ff88' : data.confidence >= 60 ? '#ffb800' : '#ff3b5c';
+        confBar.style.boxShadow = `0 0 15px ${data.confidence >= 80 ? 'rgba(0,255,136,0.5)' : data.confidence >= 60 ? 'rgba(255,184,0,0.5)' : 'rgba(255,59,92,0.5)'}`;
     }
 
-    // Risk
     const riskEl = document.getElementById('resultRisk');
     const riskBar = document.getElementById('riskBar');
     if (riskEl) riskEl.textContent = data.risk;
@@ -358,7 +375,6 @@ function showResult(data) {
         riskBar.style.background = data.risk === 'Low' ? '#00ff88' : data.risk === 'Medium' ? '#ffb800' : '#ff3b5c';
     }
 
-    // Market Strength
     const strengthEl = document.getElementById('resultStrength');
     const strBar = document.getElementById('strengthBar');
     if (strengthEl) strengthEl.textContent = `${data.market_strength}%`;
@@ -367,30 +383,26 @@ function showResult(data) {
         strBar.style.background = data.market_strength >= 70 ? '#00ff88' : data.market_strength >= 50 ? '#ffb800' : '#ff3b5c';
     }
 
-    // Strategy Tags
     const strategyTags = document.getElementById('strategyTags');
     if (strategyTags) {
         strategyTags.innerHTML = '';
         if (data.strategies && data.strategies.length > 0) {
-            data.strategies.forEach(s => {
+            data.strategies.forEach((s, index) => {
                 const tag = document.createElement('span');
-                tag.className = 'strategy-tag matched';
+                tag.className = 'strategy-tag matched tag-animate';
                 tag.textContent = s;
+                tag.style.animationDelay = `${index * 0.1}s`;
                 strategyTags.appendChild(tag);
             });
-        } else {
-            strategyTags.innerHTML = '<span style="color: rgba(200,220,255,0.5); font-size: 12px;">No strategies matched</span>';
         }
     }
 
-    // Note
     const noteEl = document.getElementById('resultNote');
     if (noteEl) noteEl.textContent = data.note || '';
 
     if (resultContainer) resultContainer.style.display = 'block';
 }
 
-// ===== SHOW WARNING =====
 function showWarning(title, message) {
     const titleEl = document.getElementById('warningTitle');
     const msgEl = document.getElementById('warningMessage');
@@ -401,15 +413,14 @@ function showWarning(title, message) {
     if (container) container.style.display = 'block';
 }
 
-// ===== RESET ANALYSIS =====
 function resetAnalysis() {
+    isAnalyzing = false;
     document.getElementById('uploadContainer').style.display = 'block';
     document.getElementById('processingContainer').style.display = 'none';
     document.getElementById('resultContainer').style.display = 'none';
     document.getElementById('warningContainer').style.display = 'none';
     removeImage();
 
-    // Reset processing steps
     ['step1', 'step2', 'step3', 'step4'].forEach((s) => {
         const step = document.getElementById(s);
         if (step) {
@@ -419,7 +430,6 @@ function resetAnalysis() {
         }
     });
     
-    // Reset progress
     const progressCircle = document.getElementById('progressCircle');
     const processPercent = document.getElementById('processPercent');
     if (progressCircle) progressCircle.style.strokeDashoffset = 283;
@@ -455,11 +465,10 @@ async function loadSupportLinks() {
             if (adminBtn) adminBtn.href = data.admin || '#';
         }
     } catch (error) {
-        console.error('Support links error:', error);
+        console.error('Support error:', error);
     }
 }
 
-// ===== NOTICE =====
 function dismissNotice() {
     const banner = document.getElementById('noticeBanner');
     if (banner) banner.style.display = 'none';
@@ -513,12 +522,11 @@ async function uploadAvatar(event) {
             showToast('Upload failed!', 'error');
         }
     } catch (error) {
-        console.error('Avatar upload error:', error);
+        console.error('Avatar error:', error);
         showToast('Connection error!', 'error');
     }
 }
 
-// ===== SAVE NICKNAME =====
 async function saveNickname() {
     const nicknameInput = document.getElementById('nickname');
     if (!nicknameInput) return;
@@ -544,16 +552,12 @@ async function saveNickname() {
             showToast('Nickname saved!', 'success');
             const nameEl = document.getElementById('profileName');
             if (nameEl) nameEl.textContent = nickname;
-        } else {
-            showToast('Failed to save nickname!', 'error');
         }
     } catch (error) {
-        console.error('Nickname error:', error);
         showToast('Connection error!', 'error');
     }
 }
 
-// ===== CHANGE PASSWORD =====
 async function changePassword() {
     const license = document.getElementById('changeLicense')?.value.trim();
     const newPass = document.getElementById('changeNewPass')?.value;
@@ -595,12 +599,10 @@ async function changePassword() {
             showToast(data.message || 'Failed!', 'error');
         }
     } catch (error) {
-        console.error('Password error:', error);
         showToast('Connection error!', 'error');
     }
 }
 
-// ===== CREDIT BAR UPDATE =====
 function updateCreditBar(current, max) {
     const fill = document.getElementById('creditBarFill');
     const text = document.getElementById('creditText');
