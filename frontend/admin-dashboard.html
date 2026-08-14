@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Analyzer - Admin Dashboard</title>
+    <title>Struggle AI - Admin Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://i.imgur.com/MQXgZBV.png" type="image/png">
 </head>
-<body class="dashboard-body admin-theme">
+<body class="dashboard-body">
 
     <!-- Sidebar -->
-    <div class="sidebar admin-sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo admin-logo">
-                <i class="fas fa-chart-line"></i>
+            <div class="sidebar-logo">
+                <img src="https://i.imgur.com/MQXgZBV.png" alt="Struggle AI">
             </div>
-            <h3>Trading Analyzer</h3>
+            <h3>STRUGGLE AI</h3>
             <p class="sidebar-role">🔧 Admin Panel</p>
         </div>
 
@@ -55,10 +56,14 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Top Bar -->
-        <div class="topbar admin-topbar">
+        <div class="topbar">
             <button class="menu-toggle" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
+            <div class="topbar-logo-mini">
+                <img src="https://i.imgur.com/MQXgZBV.png" alt="Logo">
+                <span>STRUGGLE AI</span>
+            </div>
             <div class="topbar-right">
                 <div class="admin-badge">
                     <i class="fas fa-shield-alt"></i>
@@ -78,15 +83,14 @@
                 <p>Admin Analyzer - Unlimited Access</p>
             </div>
 
-            <!-- Upload Box -->
-            <div class="upload-container">
+            <div class="upload-container" id="uploadContainer">
                 <div class="upload-box" id="uploadBox" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
                     <div class="upload-content" id="uploadContent">
                         <div class="upload-icon">
                             <i class="fas fa-cloud-upload-alt"></i>
                         </div>
                         <h3>Drop Chart Screenshot Here</h3>
-                        <p>or click to browse • Paste with Ctrl+V</p>
+                        <p>Click to browse • Drag & Drop • Paste (Ctrl+V)</p>
                         <div class="upload-formats">
                             <span>PNG</span>
                             <span>JPG</span>
@@ -95,7 +99,7 @@
                     </div>
                     <div class="upload-preview" id="uploadPreview" style="display:none;">
                         <img id="previewImg" src="" alt="Preview">
-                        <button class="remove-img" onclick="removeImage()">
+                        <button class="remove-img" onclick="removeImage(event)">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -108,7 +112,6 @@
                 </button>
             </div>
 
-            <!-- Processing -->
             <div class="processing-container" id="processingContainer" style="display:none;">
                 <div class="processing-animation">
                     <div class="processing-circle">
@@ -121,14 +124,13 @@
                 </div>
                 <h3 class="processing-text" id="processingText">Analyzing Chart...</h3>
                 <div class="processing-steps">
-                    <div class="step" id="step1"><i class="fas fa-check-circle"></i><span>Reading Chart</span></div>
+                    <div class="step" id="step1"><i class="fas fa-circle"></i><span>Reading Chart</span></div>
                     <div class="step" id="step2"><i class="fas fa-circle"></i><span>Detecting Patterns</span></div>
                     <div class="step" id="step3"><i class="fas fa-circle"></i><span>Applying Strategies</span></div>
                     <div class="step" id="step4"><i class="fas fa-circle"></i><span>Generating Signal</span></div>
                 </div>
             </div>
 
-            <!-- Result Box -->
             <div class="result-container" id="resultContainer" style="display:none;">
                 <div class="result-header" id="resultHeader">
                     <div class="result-signal" id="resultSignal">
@@ -163,7 +165,6 @@
                 </button>
             </div>
 
-            <!-- Warning Box -->
             <div class="warning-container" id="warningContainer" style="display:none;">
                 <div class="warning-icon">⚠️</div>
                 <h3 id="warningTitle">Warning</h3>
@@ -186,9 +187,7 @@
                 </div>
             </div>
 
-            <div class="users-grid" id="usersGrid">
-                <!-- Users will be loaded here -->
-            </div>
+            <div class="users-grid" id="usersGrid"></div>
         </div>
 
         <!-- ===== LICENSE GENERATOR PAGE ===== -->
@@ -220,7 +219,7 @@
                     </div>
                 </div>
 
-                <button class="save-btn generate-btn" onclick="generateLicense()">
+                <button class="save-btn" onclick="generateLicense()">
                     <i class="fas fa-plus-circle"></i> Generate License
                 </button>
 
@@ -233,7 +232,6 @@
                 </div>
             </div>
 
-            <!-- All Licenses -->
             <div class="license-list-card">
                 <h3><i class="fas fa-list"></i> All Licenses</h3>
                 <div class="table-wrapper">
@@ -247,8 +245,7 @@
                                 <th>Used By</th>
                             </tr>
                         </thead>
-                        <tbody id="licenseList">
-                        </tbody>
+                        <tbody id="licenseList"></tbody>
                     </table>
                 </div>
             </div>
@@ -310,7 +307,7 @@
                             <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(event)" style="display:none;">
                         </div>
                         <h3 id="profileName">Admin</h3>
-                        <span class="profile-badge admin-badge-tag">🔧 Admin</span>
+                        <span class="profile-badge">🔧 Admin</span>
                     </div>
 
                     <div class="profile-info-grid">
@@ -354,10 +351,8 @@
         </div>
     </div>
 
-    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-    <!-- Toast -->
     <div class="toast" id="toast">
         <div class="toast-icon" id="toastIcon"></div>
         <div class="toast-content">
